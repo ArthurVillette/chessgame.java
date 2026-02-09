@@ -5,6 +5,9 @@ import com.ChessGame.Model.Board;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.BoardPanel;
 
+/**
+ * Classe représentant le contrôleur du jeu d'échecs
+ */
 public class ChessController extends MouseAdapter {
     private Board model;
     private ChessFrame view;
@@ -21,6 +24,11 @@ public class ChessController extends MouseAdapter {
         this.boardPanel = view.getBoardPanel();
     }
 
+    /**
+     * Gère les clics de souris sur le plateau d'échecs
+     * @param e l'événement de clic de souris
+     * @Override une méthode de MouseAdapter pour gérer les clics de souris sur le plateau d'échecs
+     */
    @Override
     public void mousePressed(MouseEvent e) {
     int x = e.getX() / boardPanel.TILE_SIZE; 

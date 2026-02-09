@@ -1,14 +1,23 @@
 package com.ChessGame.Model;
 import java.awt.Color;
 
+/**
+ * Classe représentant le plateau d'échecs
+ */
 public class Board {
     private Piece[][] board;
 
+    /**
+     * Constructeur de la classe Board qui initialise le plateau d'échecs avec les pièces dans leur position de départ
+     */
     public Board() {
         board = new Piece[8][8];
         initializeBoard();
     }
 
+    /**
+     * Initialise le plateau d'échecs avec les pièces dans leur position de départ
+     */
     private void initializeBoard() {
         // Initialisation des pièces blanches
         board[0][7] = new Rook(Color.WHITE);
@@ -37,6 +46,12 @@ public class Board {
         }
     }
 
+    /**
+     * Récupère la pièce à une position donnée sur le plateau
+     * @param row la ligne de la case
+     * @param col la colonne de la case
+     * @return la pièce présente à la position (row, col) ou null si la case est vide
+     */
     public Piece getPiece(int row, int col) {
         return board[row][col];
     }

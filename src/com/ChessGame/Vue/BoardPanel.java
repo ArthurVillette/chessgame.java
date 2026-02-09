@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Classe représentant la vue du plateau d'échecs
+ */
 public class BoardPanel extends JPanel {
     private Board board;
     public static final int TILE_SIZE = 80;
@@ -21,7 +24,7 @@ public class BoardPanel extends JPanel {
     private Map<String, Image> imageCache = new HashMap<>();
 
     /**
-     * Constructeur du panel de l'échiquier
+     * Constructeur de la vue du plateau d'échecs
      * @param board Le modèle du plateau d'échecs
      */
     public BoardPanel(Board board) {
@@ -78,6 +81,9 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Charge toutes les images des pièces d'échecs dans le cache
+     */
     private void loadAllImages() {
         String[] colors = {"w", "b"};
         String[] pieces = {"P", "R", "N", "B", "Q", "K"}; // Symboles utilisés dans tes classes
@@ -95,6 +101,10 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Dessine les pièces sur le plateau d'échecs
+     * @param g le graph pour dessiner les pièces
+     */
     private void drawPieces(Graphics g) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
