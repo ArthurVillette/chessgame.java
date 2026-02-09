@@ -4,6 +4,13 @@ import com.ChessGame.Model.Board;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.Color;
+import com.ChessGame.Model.Piece;
+import javax.imageio.ImageIO;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BoardPanel extends JPanel {
     private Board board;
@@ -11,6 +18,7 @@ public class BoardPanel extends JPanel {
     
     private int selectedX = -1;
     private int selectedY = -1;
+    private Map<String, Image> imageCache = new HashMap<>();
 
     /**
      * Constructeur du panel de l'échiquier
@@ -19,6 +27,7 @@ public class BoardPanel extends JPanel {
     public BoardPanel(Board board) {
         this.board = board;
         setPreferredSize(new Dimension(8 * TILE_SIZE, 8 * TILE_SIZE));
+        loadAllImages();
     }
 
     /**
@@ -41,6 +50,7 @@ public class BoardPanel extends JPanel {
         super.paintComponent(g);
         drawGrid(g);
         drawSelection(g);
+        drawPieces(g);
     }
 
     /**
@@ -67,4 +77,39 @@ public class BoardPanel extends JPanel {
             g.fillRect(selectedX * TILE_SIZE, selectedY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
     }
+
+    private void loadAllImages() {
+        String[] colors = {"w", "b"};
+        String[] pieces = {"P", "R", "N", "B", "Q", "K"}; // Symboles utilisés dans tes classes
+        
+        for (String c : colors) {
+            for (String p : pieces) {
+                String path = "assets/pieces/" + c + p + ".png"; 
+                try {
+                    Image img = ImageIO.read(new File(path));
+                    imageCache.put("/" + path, img); 
+                } catch (IOException e) {
+                    System.out.println("Image manquante : " + path);
+                }
+            }
+        }
+    }
+
+    private void drawPieces(Graphics g) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = board.getPiece(col, row);
+                if (piece != null) {
+                    Image img = imageCache.get(piece.getImagePath());
+                    if (img != null) {
+                        g.drawImage(img, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, this);
+                    } else {
+                        g.setColor(piece.getColor());
+                        g.drawString(String.valueOf(piece.getSymbol()), col * TILE_SIZE + 35, row * TILE_SIZE + 45);
+                    }
+                }
+            }
+        }
+    }
+    
 }
