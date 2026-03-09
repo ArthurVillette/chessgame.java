@@ -25,3 +25,6 @@ replay_pid*
 
 #doc 
 /doc/
+
+#stockfish
+/moteur/stockfish/

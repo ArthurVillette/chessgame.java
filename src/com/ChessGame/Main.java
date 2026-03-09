@@ -27,7 +27,7 @@ public class Main {
             ChessController controller = new ChessController(board, frame, partie);
             frame.getBoardPanel().addMouseListener(controller);
 
-            JeuController jeuController = new JeuController(partie, frame.getBoardPanel());
+            JeuController jeuController = new JeuController(partie, frame.getBoardPanel(), frame);
             Thread threadJeu = new Thread(jeuController);
             threadJeu.setDaemon(true);
             threadJeu.start();
