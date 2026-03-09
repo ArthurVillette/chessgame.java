@@ -1,5 +1,6 @@
 package com.ChessGame.Vue;
-import javax.swing.JPanel;
+import javax.swing.*;
+
 import com.ChessGame.Model.Board;
 
 import java.awt.*;
@@ -8,15 +9,13 @@ import com.ChessGame.Model.Piece;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Classe représentant la vue du plateau d'échecs
  */
-public class BoardPanel extends JPanel {
+public class BoardPanel extends JPanel implements Observer {
     private Board board;
     public static final int TILE_SIZE = 80;
     
@@ -48,6 +47,16 @@ public class BoardPanel extends JPanel {
     }
 
     /**
+     * Met à jour la vue du plateau d'échecs lorsque le modèle change
+     * @param o l'objet observable (Partie) qui a changé
+     * @param arg un argument optionnel (non utilisé ici)
+     */
+    @Override
+    public void update(Observable o, Object arg) {
+        SwingUtilities.invokeLater(() -> repaint());
+    }
+
+    /**
      * Met à jour la liste des cases possibles pour le déplacement de la pièce sélectionnée
      * @param cases la liste des cases possibles pour le déplacement de la pièce sélectionnée
      */
@@ -66,6 +75,8 @@ public class BoardPanel extends JPanel {
             g.fillRect(p.x * TILE_SIZE, p.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
     }
+
+
 
     /**
      * Dessine le plateau d'échecs et la sélection

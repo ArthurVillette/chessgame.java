@@ -2,11 +2,12 @@ package com.ChessGame.Model;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Observable;
 
 /**
  * Classe représentant une partie d'échecs, gérant les joueurs, le plateau et les règles du jeu
  */
-public class Partie {
+public class Partie extends Observable {
     private Joueur jBlanc;
     private Joueur jNoir;
     private Joueur joueurCourant;
@@ -46,7 +47,11 @@ public class Partie {
         if (piece != null) {
             board.setPiece(coup.arrivee.x, coup.arrivee.y, piece);
             board.setPiece(coup.depart.x, coup.depart.y, null);
+
+            setChanged();
+            notifyObservers();
         }
+
     }
 
     /**

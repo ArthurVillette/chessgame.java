@@ -3,6 +3,7 @@ package com.ChessGame;
 import com.ChessGame.Controller.JeuController;
 import com.ChessGame.Model.Board;
 import com.ChessGame.Model.Partie;
+import com.ChessGame.Vue.BoardPanel;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Controller.ChessController;
 import javax.swing.SwingUtilities;
@@ -21,6 +22,9 @@ public class Main {
             Board board = new Board(); 
             ChessFrame frame = new ChessFrame(board);
             Partie partie = new Partie(board);
+            BoardPanel boardPanel = new BoardPanel(board);
+
+            partie.addObserver(boardPanel);
 
             ChessController controller = new ChessController(board, frame,partie);
             frame.getBoardPanel().addMouseListener(controller);
