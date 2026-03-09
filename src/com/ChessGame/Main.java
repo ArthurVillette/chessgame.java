@@ -1,6 +1,8 @@
 package com.ChessGame;
 
+import com.ChessGame.Controller.JeuController;
 import com.ChessGame.Model.Board;
+import com.ChessGame.Model.Partie;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Controller.ChessController;
 import javax.swing.SwingUtilities;
@@ -18,8 +20,15 @@ public class Main {
 
             Board board = new Board(); 
             ChessFrame frame = new ChessFrame(board);
-            ChessController controller = new ChessController(board, frame);
+            Partie partie = new Partie(board);
+
+            ChessController controller = new ChessController(board, frame,partie);
             frame.getBoardPanel().addMouseListener(controller);
+
+            JeuController jeuController = new JeuController(partie, frame.getBoardPanel());
+            Thread threadJeu = new Thread(jeuController);
+            threadJeu.setDaemon(true);
+            threadJeu.start();
             frame.setVisible(true);
             
             System.out.println("Le moteur d'échecs est démarré !");

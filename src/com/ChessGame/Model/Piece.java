@@ -1,5 +1,7 @@
 package com.ChessGame.Model;
-import java.awt.Color; 
+import java.awt.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Classe abstraite représentant une pièce d'échecs
@@ -43,4 +45,11 @@ public abstract class Piece {
         return "/assets/pieces/" + colorP + symbol + ".png";
 
 }
+    /**
+     * Méthode abstraite à implémenter dans les classes filles pour retourner les mouvements valides de la pièce
+     * @param position La position actuelle de la pièce sur le plateau
+     * @param board Le plateau de jeu actuel
+     * @return Une liste de points représentant les positions valides où la pièce peut se déplacer
+     */
+    public abstract List<Point> mouvementsValides(Point position, Board board);
 }

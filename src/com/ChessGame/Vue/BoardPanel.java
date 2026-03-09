@@ -1,14 +1,15 @@
 package com.ChessGame.Vue;
 import javax.swing.JPanel;
 import com.ChessGame.Model.Board;
-import java.awt.Graphics;
-import java.awt.Dimension;
-import java.awt.Color;
+
+import java.awt.*;
+
 import com.ChessGame.Model.Piece;
 import javax.imageio.ImageIO;
-import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,8 @@ public class BoardPanel extends JPanel {
     private int selectedX = -1;
     private int selectedY = -1;
     private Map<String, Image> imageCache = new HashMap<>();
+
+    private List<Point> casesPossibles = new ArrayList<>();
 
     /**
      * Constructeur de la vue du plateau d'échecs
@@ -45,6 +48,26 @@ public class BoardPanel extends JPanel {
     }
 
     /**
+     * Met à jour la liste des cases possibles pour le déplacement de la pièce sélectionnée
+     * @param cases la liste des cases possibles pour le déplacement de la pièce sélectionnée
+     */
+    public void setCasesPossibles(List<Point> cases) {
+        this.casesPossibles = cases;
+        repaint();
+    }
+
+    /**
+     * Dessine les cases possibles pour le déplacement de la pièce sélectionnée
+     * @param g le graph pour dessiner les cases possibles
+     */
+    private void drawCasesPossibles(Graphics g) {
+        g.setColor(new Color(0, 0, 255, 150));
+        for (Point p : casesPossibles) {
+            g.fillRect(p.x * TILE_SIZE, p.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
+    }
+
+    /**
      * Dessine le plateau d'échecs et la sélection
      * @param g le graph pour dessiner le plateau et la sélection
      */
@@ -53,6 +76,7 @@ public class BoardPanel extends JPanel {
         super.paintComponent(g);
         drawGrid(g);
         drawSelection(g);
+        drawCasesPossibles(g);
         drawPieces(g);
     }
 

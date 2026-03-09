@@ -1,11 +1,12 @@
 package com.ChessGame.Model;
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * Classe représentant le plateau d'échecs
  */
 public class Board {
     private Piece[][] board;
+
 
     /**
      * Constructeur de la classe Board qui initialise le plateau d'échecs avec les pièces dans leur position de départ
@@ -55,5 +56,15 @@ public class Board {
     public Piece getPiece(int row, int col) {
         return board[row][col];
     }
+
+    /**
+     * Place une pièce à une position donnée sur le plateau
+     * @param row la ligne de la case
+     * @param col la colonne de la case
+     * @param piece la pièce à placer à la position (row, col)
+     */
+    public void setPiece(int row, int col, Piece piece) { board[row][col] = piece; }
+
+
 }
 
