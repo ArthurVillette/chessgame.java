@@ -1,4 +1,5 @@
 package com.ChessGame.Controller;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,6 @@ import com.ChessGame.Model.Partie;
 import com.ChessGame.Model.Piece;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.BoardPanel;
-
 
 /**
  * Classe représentant le contrôleur du jeu d'échecs
@@ -25,8 +25,9 @@ public class ChessController extends MouseAdapter {
 
     /**
      * Constructeur du contrôleur d'échecs
+     * 
      * @param model Le modèle du plateau d'échecs
-     * @param view La vue principale de l'application
+     * @param view  La vue principale de l'application
      */
     public ChessController(Board model, ChessFrame view) {
         this.model = model;
@@ -43,45 +44,49 @@ public class ChessController extends MouseAdapter {
 
     /**
      * Gère les clics de souris sur le plateau d'échecs
+     * 
      * @param e l'événement de clic de souris
-     * @Override une méthode de MouseAdapter pour gérer les clics de souris sur le plateau d'échecs
+     * @Override une méthode de MouseAdapter pour gérer les clics de souris sur le
+     *           plateau d'échecs
      */
-   @Override
+    @Override
     public void mousePressed(MouseEvent e) {
-    int x = e.getX() / boardPanel.TILE_SIZE; 
-    int y = e.getY() / boardPanel.TILE_SIZE;
+        int x = e.getX() / boardPanel.TILE_SIZE;
+        int y = e.getY() / boardPanel.TILE_SIZE;
 
-    //boardPanel.setSelection(x, y);
-   if (selection == null) {
-       Piece piece = model.getPiece(x, y);
-       if (piece == null) return;
-       if (piece.getColor() != partie.getJoueurCourant().getCouleur()) return;
-       // Premier clic : sélectionner une pièce
-       if (model.getPiece(x, y) != null) {
-           selection = new Point(x, y);
-           boardPanel.setSelection(x, y);
+        // boardPanel.setSelection(x, y);
+        if (selection == null) {
+            Piece piece = model.getPiece(x, y);
+            if (piece == null)
+                return;
+            if (piece.getColor() != partie.getJoueurCourant().getCouleur())
+                return;
+            // Premier clic : sélectionner une pièce
+            if (model.getPiece(x, y) != null) {
+                selection = new Point(x, y);
+                boardPanel.setSelection(x, y);
 
-           // Calcule et affiche les cases possibles
-           List<Point> moves = piece.mouvementsValides(selection, model);
-           boardPanel.setCasesPossibles(moves);
-       }
-   } else {
-       //deuxieme click
-       // Si on reclique la même case → désélectionner simplement
-       if (selection.x == x && selection.y == y) {
-           selection = null;
-           boardPanel.setSelection(-1, -1);
-           boardPanel.setCasesPossibles(new ArrayList<>());
-           return;
-       }
-       // Sinon envoyer le coup normalement
-       Coup coup = new Coup(selection, new Point(x, y));
-       if (partie.coupValide(coup)) {
-           partie.getJoueurCourant().setCoup(coup);
-           selection = null;
-           boardPanel.setSelection(-1, -1);
-           boardPanel.setCasesPossibles(new ArrayList<>());
-   }
+                // Calcule et affiche les cases possibles
+                List<Point> moves = piece.getMouvementsLegaux(selection, model, partie);
+                boardPanel.setCasesPossibles(moves);
+            }
+        } else {
+            // deuxieme click
+            // Si on reclique la même case → désélectionner simplement
+            if (selection.x == x && selection.y == y) {
+                selection = null;
+                boardPanel.setSelection(-1, -1);
+                boardPanel.setCasesPossibles(new ArrayList<>());
+                return;
+            }
+            // Sinon envoyer le coup normalement
+            Coup coup = new Coup(selection, new Point(x, y));
+            if (partie.coupValide(coup)) {
+                partie.getJoueurCourant().setCoup(coup);
+                selection = null;
+                boardPanel.setSelection(-1, -1);
+                boardPanel.setCasesPossibles(new ArrayList<>());
+            }
+        }
+    }
 }
-}}
-    
