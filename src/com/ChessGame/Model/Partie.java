@@ -77,8 +77,11 @@ public class Partie extends Observable {
         if (piece == null)
             return false;
 
-        List<Point> mouvements = piece.mouvementsValides(coup.depart, board);
-        return mouvements.contains(coup.arrivee);
+        List<Point> mouvementsPossibles = piece.mouvementsValides(coup.depart, board);
+        if (!mouvementsPossibles.contains(coup.arrivee))
+            return false;
+
+        return !coupLaisseLeRoiEnEchec(coup);
     }
 
     /**
@@ -161,6 +164,31 @@ public class Partie extends Observable {
             }
         }
         return true;
+    }
+
+    /**
+     * Vérifie si un coup laisse le roi en échec après son application
+     * 
+     * @param coup Le coup à vérifier
+     * @return true si le coup laisse le roi en échec, false sinon
+     */
+    public boolean coupLaisseLeRoiEnEchec(Coup coup) {
+        // On sauvegarde l'état actuel pour le restaurer
+        Piece pieceDepart = board.getPiece(coup.depart.x, coup.depart.y);
+        Piece pieceArrivee = board.getPiece(coup.arrivee.x, coup.arrivee.y);
+
+        // Simulation du mouvement
+        board.setPiece(coup.arrivee.x, coup.arrivee.y, pieceDepart);
+        board.setPiece(coup.depart.x, coup.depart.y, null);
+
+        // On vérifie l'échec sur le joueur qui vient de simuler son coup
+        boolean enEchec = roiEnEchec(joueurCourant);
+
+        // Restauration du plateau (Backtracking)
+        board.setPiece(coup.depart.x, coup.depart.y, pieceDepart);
+        board.setPiece(coup.arrivee.x, coup.arrivee.y, pieceArrivee);
+
+        return enEchec;
     }
 
     /**
