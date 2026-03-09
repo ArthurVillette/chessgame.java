@@ -37,7 +37,6 @@ public class JeuController implements Runnable {
                 partie.appliquerCoup(coup);
 
                 partie.passerTour();
-                SwingUtilities.invokeLater(() -> boardPanel.repaint());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
