@@ -9,20 +9,18 @@ import javax.swing.SwingUtilities;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-
 /**
  * Classe principale du jeu d'échecs
  */
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            
 
-            Board board = new Board(); 
+            Board board = new Board();
             ChessFrame frame = new ChessFrame(board);
             Partie partie = new Partie(board);
 
-            ChessController controller = new ChessController(board, frame,partie);
+            ChessController controller = new ChessController(board, frame, partie);
             frame.getBoardPanel().addMouseListener(controller);
 
             JeuController jeuController = new JeuController(partie, frame.getBoardPanel());
@@ -30,9 +28,9 @@ public class Main {
             threadJeu.setDaemon(true);
             threadJeu.start();
             frame.setVisible(true);
-            
+
             System.out.println("Le moteur d'échecs est démarré !");
-           
+
         });
     }
 }

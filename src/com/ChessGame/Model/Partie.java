@@ -4,7 +4,8 @@ import java.awt.*;
 import java.util.List;
 
 /**
- * Classe représentant une partie d'échecs, gérant les joueurs, le plateau et les règles du jeu
+ * Classe représentant une partie d'échecs, gérant les joueurs, le plateau et
+ * les règles du jeu
  */
 public class Partie {
     private Joueur jBlanc;
@@ -14,6 +15,7 @@ public class Partie {
 
     /**
      * Constructeur de la classe Partie
+     * 
      * @param board Le plateau de jeu à utiliser pour la partie
      */
     public Partie(Board board) {
@@ -22,14 +24,22 @@ public class Partie {
         this.jNoir = new Joueur(false);
         this.joueurCourant = jBlanc;
     }
-    /** Getters pour accéder aux joueurs et au plateau de jeu
+
+    /**
+     * Getters pour accéder aux joueurs et au plateau de jeu
      */
-    public Joueur getJoueurCourant() { return joueurCourant; }
+    public Joueur getJoueurCourant() {
+        return joueurCourant;
+    }
+
     /**
      * Permet d'obtenir le plateau de jeu actuel
+     * 
      * @return Le plateau de jeu utilisé dans la partie
      */
-    public Board getBoard() { return board; }
+    public Board getBoard() {
+        return board;
+    }
 
     /**
      * Permet de passer le tour au joueur suivant
@@ -37,8 +47,10 @@ public class Partie {
     public void passerTour() {
         joueurCourant = (joueurCourant == jBlanc) ? jNoir : jBlanc;
     }
+
     /**
      * Applique un coup sur le plateau de jeu
+     * 
      * @param coup Le coup à appliquer
      */
     public void appliquerCoup(Coup coup) {
@@ -51,23 +63,121 @@ public class Partie {
 
     /**
      * Vérifie si un coup est valide selon les règles du jeu
+     * 
      * @param coup Le coup à vérifier
      * @return true si le coup est valide, false sinon
      */
     public boolean coupValide(Coup coup) {
         Piece piece = board.getPiece(coup.depart.x, coup.depart.y);
-        if (piece == null) return false;
+        if (piece == null)
+            return false;
 
         List<Point> mouvements = piece.mouvementsValides(coup.depart, board);
         return mouvements.contains(coup.arrivee);
     }
 
     /**
+     * Vérifie si le roi est en échec
+     * 
+     * @param joueur Le joueur dont on veut vérifier si le roi est en échec
+     * @return true si le roi est en échec, false sinon
+     */
+    public boolean roiEnEchec(Joueur joueur) {
+        Point posRoi = null;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece p = board.getPiece(i, j);
+                if (p instanceof King && p.getColor().equals(joueur.getCouleur())) {
+                    posRoi = new Point(i, j);
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece p = board.getPiece(i, j);
+                if (p != null && !p.getColor().equals(joueur.getCouleur())) {
+                    if (p.mouvementsValides(new Point(i, j), board).contains(posRoi)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean roiEnEchecEtMat(Joueur joueur) {
+        if (!roiEnEchec(joueur)) {
+            return false;
+        }
+        Point posRoi = null;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece p = board.getPiece(i, j);
+                if (p instanceof King && p.getColor().equals(joueur.getCouleur())) {
+                    posRoi = new Point(i, j);
+                    break;
+                }
+            }
+        }
+        List<Point> mouvementsRoi = board.getPiece(posRoi.x, posRoi.y).mouvementsValides(posRoi, board);
+        for (Point move : mouvementsRoi) {
+            Board copieBoard = new Board(board);
+            copieBoard.setPiece(move.x, move.y, copieBoard.getPiece(posRoi.x, posRoi.y));
+            copieBoard.setPiece(posRoi.x, posRoi.y, null);
+            Partie partieTest = new Partie(copieBoard);
+            if (!partieTest.roiEnEchec(joueur)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean pat(Joueur joueur) {
+        if (roiEnEchec(joueur)) {
+            return false;
+        }
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece p = board.getPiece(i, j);
+                if (p != null && p.getColor().equals(joueur.getCouleur())) {
+                    List<Point> mouvements = p.mouvementsValides(new Point(i, j), board);
+                    for (Point move : mouvements) {
+                        Board copieBoard = new Board(board);
+                        copieBoard.setPiece(move.x, move.y, copieBoard.getPiece(i, j));
+                        copieBoard.setPiece(i, j, null);
+                        Partie partieTest = new Partie(copieBoard);
+                        if (!partieTest.roiEnEchec(joueur)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * Vérifie si la partie est terminée (échec et mat, pat, etc.)
+     * 
      * @return true si la partie est terminée, false sinon
      */
     public boolean estTerminee() {
-        //-----TO DO: implémenter la logique de fin de partie (échec et mat, pat, etc.)
+        if (roiEnEchecEtMat(jBlanc)) {
+            System.out.println("Échec et mat ! Les noirs gagnent !");
+            return true;
+        } else if (roiEnEchecEtMat(jNoir)) {
+            System.out.println("Échec et mat ! Les blancs gagnent !");
+            return true;
+        } else if (pat(jBlanc)) {
+            System.out.println("Pat ! La partie est nulle !");
+            return true;
+        } else if (pat(jNoir)) {
+            System.out.println("Pat ! La partie est nulle !");
+            return true;
+        }
+
         return false;
     }
 }

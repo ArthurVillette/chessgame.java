@@ -1,4 +1,5 @@
 package com.ChessGame.Model;
+
 import java.awt.*;
 
 /**
@@ -7,13 +8,28 @@ import java.awt.*;
 public class Board {
     private Piece[][] board;
 
-
     /**
-     * Constructeur de la classe Board qui initialise le plateau d'échecs avec les pièces dans leur position de départ
+     * Constructeur de la classe Board qui initialise le plateau d'échecs avec les
+     * pièces dans leur position de départ
      */
     public Board() {
         board = new Piece[8][8];
         initializeBoard();
+    }
+
+    /**
+     * Constructeur de copie pour créer une nouvelle instance de Board à partir
+     * d'une instance existante
+     * 
+     * @param source L'instance de Board à copier
+     */
+    public Board(Board source) {
+        this.board = new Piece[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                this.board[i][j] = source.board[i][j];
+            }
+        }
     }
 
     /**
@@ -29,7 +45,7 @@ public class Board {
         board[5][7] = new Bishop(Color.WHITE);
         board[6][7] = new Knight(Color.WHITE);
         board[7][7] = new Rook(Color.WHITE);
-        
+
         for (int lin = 0; lin < 8; lin++) {
             board[lin][6] = new Pawn(Color.WHITE);
         }
@@ -49,9 +65,11 @@ public class Board {
 
     /**
      * Récupère la pièce à une position donnée sur le plateau
+     * 
      * @param row la ligne de la case
      * @param col la colonne de la case
-     * @return la pièce présente à la position (row, col) ou null si la case est vide
+     * @return la pièce présente à la position (row, col) ou null si la case est
+     *         vide
      */
     public Piece getPiece(int row, int col) {
         return board[row][col];
@@ -59,12 +77,13 @@ public class Board {
 
     /**
      * Place une pièce à une position donnée sur le plateau
-     * @param row la ligne de la case
-     * @param col la colonne de la case
+     * 
+     * @param row   la ligne de la case
+     * @param col   la colonne de la case
      * @param piece la pièce à placer à la position (row, col)
      */
-    public void setPiece(int row, int col, Piece piece) { board[row][col] = piece; }
-
+    public void setPiece(int row, int col, Piece piece) {
+        board[row][col] = piece;
+    }
 
 }
-

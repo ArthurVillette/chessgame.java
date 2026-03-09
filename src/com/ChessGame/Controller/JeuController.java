@@ -14,7 +14,8 @@ public class JeuController implements Runnable {
 
     /**
      * Constructeur du JeuController
-     * @param partie La partie en cours à contrôler
+     * 
+     * @param partie     La partie en cours à contrôler
      * @param boardPanel Le panneau de jeu à mettre à jour après chaque coup
      */
     public JeuController(Partie partie, BoardPanel boardPanel) {
@@ -23,7 +24,8 @@ public class JeuController implements Runnable {
     }
 
     /**
-     * La boucle de jeu principale, qui attend les coups des joueurs et met à jour la partie
+     * La boucle de jeu principale, qui attend les coups des joueurs et met à jour
+     * la partie
      * jusqu'à ce que la partie soit terminée
      */
     @Override
@@ -33,6 +35,7 @@ public class JeuController implements Runnable {
             try {
                 Coup coup = joueurCourant.getCoup(); // BLOQUE ici
                 partie.appliquerCoup(coup);
+
                 partie.passerTour();
                 SwingUtilities.invokeLater(() -> boardPanel.repaint());
             } catch (InterruptedException e) {
@@ -40,5 +43,18 @@ public class JeuController implements Runnable {
                 break;
             }
         }
+        SwingUtilities.invokeLater(() -> {
+            String message;
+            if (partie.roiEnEchec(partie.getJoueurCourant())) {
+                message = "Échec et mat ! " + (partie.getJoueurCourant().isWhite() ? "Les Noirs" : "Les Blancs")
+                        + " ont gagné.";
+            } else {
+                message = "Match nul (Pat) !";
+            }
+
+            javax.swing.JOptionPane.showMessageDialog(boardPanel, message, "Fin de partie",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        });
+
     }
 }
