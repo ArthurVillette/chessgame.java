@@ -15,6 +15,7 @@ public class ChessFrame extends JFrame {
     public static final int TILE_SIZE = 80;
     private BoardPanel boardPanel;
     private JTextArea historiqueArea;
+    private EvaluationPanel evaluationPanel;
 
     /**
      * Constructeur de la fenêtre principale du jeu d'échecs
@@ -25,6 +26,9 @@ public class ChessFrame extends JFrame {
         setTitle("PoissonBloquer");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        this.evaluationPanel = new EvaluationPanel();
+        add(evaluationPanel, BorderLayout.WEST);
 
         this.boardPanel = new BoardPanel(board);
         add(boardPanel, BorderLayout.CENTER);
@@ -52,4 +56,9 @@ public class ChessFrame extends JFrame {
         historiqueArea.append(texte);
         historiqueArea.setCaretPosition(historiqueArea.getDocument().getLength());
     }
+
+    public void mettreAJourJauge(double scoreCentipions) {
+        evaluationPanel.setScore(scoreCentipions);
+    }
+
 }

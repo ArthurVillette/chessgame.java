@@ -4,6 +4,7 @@ import com.ChessGame.Model.*;
 import com.ChessGame.Vue.BoardPanel;
 import javax.swing.SwingUtilities;
 import com.ChessGame.Vue.ChessFrame;
+import com.ChessGame.Vue.EvaluationPanel;
 
 /**
  * Classe responsable de la boucle de jeu, exécutée dans un thread séparé
@@ -13,17 +14,23 @@ public class JeuController implements Runnable {
     private Partie partie;
     private BoardPanel boardPanel;
     private ChessFrame frame;
+    private EvaluationPanel evaluationPanel;
     private int moveCount = 1;
 
     /**
      * Constructeur du JeuController
      * 
-     * @param partie     La partie en cours à contrôler
-     * @param boardPanel Le panneau de jeu à mettre à jour après chaque coup
+     * @param partie          La partie en cours à contrôler
+     * @param boardPanel      Le panneau de jeu à mettre à jour après chaque coup
+     * @param evaluationPanel Le panneau d'évaluation à mettre à jour après chaque
+     *                        coup
+     * @param frame           La fenêtre principale pour afficher les messages de
+     *                        fin de partie
      */
-    public JeuController(Partie partie, BoardPanel boardPanel, ChessFrame frame) {
+    public JeuController(Partie partie, BoardPanel boardPanel, EvaluationPanel evaluationPanel, ChessFrame frame) {
         this.partie = partie;
         this.boardPanel = boardPanel;
+        this.evaluationPanel = evaluationPanel;
         this.frame = frame;
     }
 
@@ -41,7 +48,12 @@ public class JeuController implements Runnable {
                 String notationCoup = genererNotation(coup, partie);
                 partie.appliquerCoup(coup);
                 partie.passerTour();
+                SwingUtilities.invokeLater(() -> frame.getBoardPanel().repaint());
                 SwingUtilities.invokeLater(() -> frame.ajouterCoup(notationCoup));
+                new Thread(() -> {
+                    double scoreAvantage = partie.evaluerPositionAvecStockfish();
+                    SwingUtilities.invokeLater(() -> frame.mettreAJourJauge(scoreAvantage));
+                }).start();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
@@ -73,7 +85,7 @@ public class JeuController implements Runnable {
     private String genererNotation(Coup coup, Partie partie) {
         Piece piece = partie.getBoard().getPiece(coup.depart.x, coup.depart.y);
         Piece cible = partie.getBoard().getPiece(coup.arrivee.x, coup.arrivee.y);
-        String symbol = piece.getSymbol() == 'P' ? "" : String.valueOf(piece.getSymbol());
+        String symbol = piece.getSymbol() == 'p' ? "" : String.valueOf(piece.getSymbol());
         boolean isCapture = (cible != null);
 
         char colArrivee = (char) ('a' + coup.arrivee.x);

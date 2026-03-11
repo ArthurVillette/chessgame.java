@@ -1,5 +1,11 @@
 # Création d'un jeu d'échec (PoissonBloqué)
 
+## Prerequie
+
+- Avoir java sur son PC
+- Installé Stockfish sur votre PC
+- Dans un fichier .env a la racine du projet ajouté le chemin dans votre variable: CHEMIN_STOCKFISH
+
 ## Lancement 
 
 Compilation utilisé cette commande :
