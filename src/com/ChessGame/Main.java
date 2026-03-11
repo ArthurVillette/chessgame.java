@@ -6,10 +6,9 @@ import com.ChessGame.Model.Partie;
 import com.ChessGame.Vue.BoardPanel;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.EvaluationPanel;
+import com.ChessGame.Vue.MenuDemarrage; // N'oubliez pas l'import du menu !
 import com.ChessGame.Controller.ChessController;
 import javax.swing.SwingUtilities;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 /**
  * Classe principale du jeu d'échecs
@@ -18,10 +17,22 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
 
+            MenuDemarrage menu = new MenuDemarrage();
+            menu.setVisible(true);
+            if (!menu.isStartClicked()) {
+                System.out.println("Fermeture du jeu.");
+                System.exit(0);
+            }
+
+            boolean contreIA = menu.isContreIA();
+            boolean humainEstBlanc = menu.isHumainEstBlanc();
+
             Board board = new Board();
             ChessFrame frame = new ChessFrame(board);
-            Partie partie = new Partie(board);
-            BoardPanel boardPanel = new BoardPanel(board);
+
+            Partie partie = new Partie(board, contreIA, humainEstBlanc);
+
+            BoardPanel boardPanel = frame.getBoardPanel();
             EvaluationPanel evaluationPanel = new EvaluationPanel();
 
             partie.addObserver(boardPanel);
@@ -33,9 +44,10 @@ public class Main {
             Thread threadJeu = new Thread(jeuController);
             threadJeu.setDaemon(true);
             threadJeu.start();
+
             frame.setVisible(true);
 
-            System.out.println("Le moteur d'échecs est démarré !");
+            System.out.println("Le jeu d'échecs est démarré avec succès !");
 
         });
     }
