@@ -5,6 +5,8 @@ import com.ChessGame.Vue.BoardPanel;
 import javax.swing.SwingUtilities;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.EvaluationPanel;
+import com.ChessGame.Vue.SettingPanel;
+import javax.swing.JScrollPane;
 
 /**
  * Classe responsable de la boucle de jeu, exécutée dans un thread séparé
@@ -16,6 +18,10 @@ public class JeuController implements Runnable {
     private ChessFrame frame;
     private EvaluationPanel evaluationPanel;
     private int moveCount = 1;
+    private boolean estEvaluer = false;
+    private boolean anotationEchec = true;
+    private JScrollPane scrollPaneHistorique;
+    private SettingPanel settingPanel;
 
     /**
      * Constructeur du JeuController
@@ -41,19 +47,40 @@ public class JeuController implements Runnable {
      */
     @Override
     public void run() {
+        SettingPanel menu = frame.getSettingPanel();
+
+        menu.getItemJauge().addActionListener(e -> {
+            boolean actif = menu.getItemJauge().isSelected();
+            this.SetEstEvaluer(actif);
+            frame.getEvaluationPanel().setVisible(actif);
+            frame.pack();
+        });
+
+        menu.getItemNotation().addActionListener(e -> {
+            boolean actif = menu.getItemNotation().isSelected();
+            this.setAnotationEchec(actif);
+            frame.getScrollPaneHistorique().setVisible(actif);
+            frame.pack();
+        });
+
         while (!partie.estTerminee()) {
             Joueur joueurCourant = partie.getJoueurCourant();
             try {
                 Coup coup = joueurCourant.getCoup();
-                String notationCoup = genererNotation(coup, partie);
+                if (this.anotationEchec) {
+                    String notationCoup = genererNotation(coup, partie);
+                    SwingUtilities.invokeLater(() -> frame.ajouterCoup(notationCoup));
+                }
+
                 partie.appliquerCoup(coup);
                 partie.passerTour();
                 SwingUtilities.invokeLater(() -> frame.getBoardPanel().repaint());
-                SwingUtilities.invokeLater(() -> frame.ajouterCoup(notationCoup));
-                new Thread(() -> {
-                    double scoreAvantage = partie.evaluerPositionAvecStockfish();
-                    SwingUtilities.invokeLater(() -> frame.mettreAJourJauge(scoreAvantage));
-                }).start();
+                if (this.estEvaluer) {
+                    new Thread(() -> {
+                        double scoreAvantage = partie.evaluerPositionAvecStockfish();
+                        SwingUtilities.invokeLater(() -> frame.mettreAJourJauge(scoreAvantage));
+                    }).start();
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
@@ -113,5 +140,42 @@ public class JeuController implements Runnable {
         } else {
             return notation + "\n";
         }
+    }
+
+    /**
+     * Permet de définir si l'évaluation de la position doit être affichée ou non
+     * 
+     * @param estEvaluer true pour afficher l'évaluation, false pour la masquer
+     */
+    public void SetEstEvaluer(boolean estEvaluer) {
+        this.estEvaluer = estEvaluer;
+    }
+
+    /**
+     * Permet de définir si les notations des coups doivent être affichées ou non
+     * 
+     * @param anotationEchec true pour afficher les notations, false pour les
+     *                       masquer
+     */
+    public void setAnotationEchec(boolean anotationEchec) {
+        this.anotationEchec = anotationEchec;
+    }
+
+    /**
+     * Permet de savoir si les notations des coups sont affichées ou non
+     * 
+     * @return true si les notations sont affichées, false sinon
+     */
+    public boolean isAnotationEchec() {
+        return anotationEchec;
+    }
+
+    /**
+     * Permet de savoir si l'évaluation de la position est affichée ou non
+     * 
+     * @return true si l'évaluation est affichée, false sinon
+     */
+    public boolean isEstEvaluer() {
+        return estEvaluer;
     }
 }
