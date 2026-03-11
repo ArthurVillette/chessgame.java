@@ -5,6 +5,7 @@ import com.ChessGame.Model.Board;
 import com.ChessGame.Model.Partie;
 import com.ChessGame.Vue.BoardPanel;
 import com.ChessGame.Vue.ChessFrame;
+import com.ChessGame.Vue.EvaluationPanel;
 import com.ChessGame.Controller.ChessController;
 import javax.swing.SwingUtilities;
 import java.awt.event.MouseAdapter;
@@ -21,13 +22,14 @@ public class Main {
             ChessFrame frame = new ChessFrame(board);
             Partie partie = new Partie(board);
             BoardPanel boardPanel = new BoardPanel(board);
+            EvaluationPanel evaluationPanel = new EvaluationPanel();
 
             partie.addObserver(boardPanel);
 
             ChessController controller = new ChessController(board, frame, partie);
             frame.getBoardPanel().addMouseListener(controller);
 
-            JeuController jeuController = new JeuController(partie, frame.getBoardPanel(), frame);
+            JeuController jeuController = new JeuController(partie, frame.getBoardPanel(), evaluationPanel, frame);
             Thread threadJeu = new Thread(jeuController);
             threadJeu.setDaemon(true);
             threadJeu.start();

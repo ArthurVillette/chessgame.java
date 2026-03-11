@@ -1,4 +1,5 @@
 package com.ChessGame.Vue;
+
 import javax.swing.*;
 
 import com.ChessGame.Model.Board;
@@ -18,7 +19,7 @@ import java.util.List;
 public class BoardPanel extends JPanel implements Observer {
     private Board board;
     public static final int TILE_SIZE = 80;
-    
+
     private int selectedX = -1;
     private int selectedY = -1;
     private Map<String, Image> imageCache = new HashMap<>();
@@ -27,6 +28,7 @@ public class BoardPanel extends JPanel implements Observer {
 
     /**
      * Constructeur de la vue du plateau d'échecs
+     * 
      * @param board Le modèle du plateau d'échecs
      */
     public BoardPanel(Board board) {
@@ -37,6 +39,7 @@ public class BoardPanel extends JPanel implements Observer {
 
     /**
      * Met à jour la sélection de la case cliquée
+     * 
      * @param x les coordonnées x de la case sélectionnée
      * @param y les coordonnées y de la case sélectionnée
      */
@@ -48,7 +51,8 @@ public class BoardPanel extends JPanel implements Observer {
 
     /**
      * Met à jour la vue du plateau d'échecs lorsque le modèle change
-     * @param o l'objet observable (Partie) qui a changé
+     * 
+     * @param o   l'objet observable (Partie) qui a changé
      * @param arg un argument optionnel (non utilisé ici)
      */
     @Override
@@ -57,8 +61,11 @@ public class BoardPanel extends JPanel implements Observer {
     }
 
     /**
-     * Met à jour la liste des cases possibles pour le déplacement de la pièce sélectionnée
-     * @param cases la liste des cases possibles pour le déplacement de la pièce sélectionnée
+     * Met à jour la liste des cases possibles pour le déplacement de la pièce
+     * sélectionnée
+     * 
+     * @param cases la liste des cases possibles pour le déplacement de la pièce
+     *              sélectionnée
      */
     public void setCasesPossibles(List<Point> cases) {
         this.casesPossibles = cases;
@@ -67,6 +74,7 @@ public class BoardPanel extends JPanel implements Observer {
 
     /**
      * Dessine les cases possibles pour le déplacement de la pièce sélectionnée
+     * 
      * @param g le graph pour dessiner les cases possibles
      */
     private void drawCasesPossibles(Graphics g) {
@@ -76,10 +84,9 @@ public class BoardPanel extends JPanel implements Observer {
         }
     }
 
-
-
     /**
      * Dessine le plateau d'échecs et la sélection
+     * 
      * @param g le graph pour dessiner le plateau et la sélection
      */
     @Override
@@ -93,13 +100,16 @@ public class BoardPanel extends JPanel implements Observer {
 
     /**
      * Dessine la grille du plateau d'échecs
+     * 
      * @param g le graph pour dessiner la grille
      */
     private void drawGrid(Graphics g) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if ((row + col) % 2 == 0) g.setColor(new Color(235, 235, 208));
-                else g.setColor(new Color(119, 148, 85));
+                if ((row + col) % 2 == 0)
+                    g.setColor(new Color(235, 235, 208));
+                else
+                    g.setColor(new Color(119, 148, 85));
                 g.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
@@ -107,6 +117,7 @@ public class BoardPanel extends JPanel implements Observer {
 
     /**
      * Dessine un carré rouge semi-transparent sur la case sélectionnée
+     * 
      * @param g le graph pour dessiner la sélection
      */
     private void drawSelection(Graphics g) {
@@ -120,15 +131,15 @@ public class BoardPanel extends JPanel implements Observer {
      * Charge toutes les images des pièces d'échecs dans le cache
      */
     private void loadAllImages() {
-        String[] colors = {"w", "b"};
-        String[] pieces = {"P", "R", "N", "B", "Q", "K"}; // Symboles utilisés dans tes classes
-        
+        String[] colors = { "w", "b" };
+        String[] pieces = { "p", "r", "n", "b", "q", "k" }; // Symboles utilisés dans tes classes
+
         for (String c : colors) {
             for (String p : pieces) {
-                String path = "assets/pieces/" + c + p + ".png"; 
+                String path = "assets/pieces/" + c + p + ".png";
                 try {
                     Image img = ImageIO.read(new File(path));
-                    imageCache.put("/" + path, img); 
+                    imageCache.put("/" + path, img);
                 } catch (IOException e) {
                     System.out.println("Image manquante : " + path);
                 }
@@ -138,6 +149,7 @@ public class BoardPanel extends JPanel implements Observer {
 
     /**
      * Dessine les pièces sur le plateau d'échecs
+     * 
      * @param g le graph pour dessiner les pièces
      */
     private void drawPieces(Graphics g) {
@@ -156,5 +168,5 @@ public class BoardPanel extends JPanel implements Observer {
             }
         }
     }
-    
+
 }

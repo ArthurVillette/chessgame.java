@@ -86,4 +86,50 @@ public class Board {
         board[row][col] = piece;
     }
 
+    /**
+     * Convertit l'état actuel du plateau en chaîne FEN (Forsyth-Edwards Notation)
+     * 
+     * @param tourBlancs true si c'est aux blancs de jouer, false pour les noirs
+     * @return La chaîne FEN représentant la position
+     */
+    public String toFEN(boolean tourBlancs) {
+        StringBuilder fen = new StringBuilder();
+
+        for (int y = 0; y < 8; y++) {
+            int casesVides = 0;
+            for (int x = 0; x < 8; x++) {
+                Piece p = getPiece(x, y);
+                if (p == null) {
+                    casesVides++;
+                } else {
+                    if (casesVides > 0) {
+                        fen.append(casesVides);
+                        casesVides = 0;
+                    }
+
+                    char lettre = p.getSymbol();
+
+                    if (p.getColor() == java.awt.Color.WHITE) {
+                        lettre = Character.toUpperCase(lettre);
+                    }
+                    fen.append(lettre);
+                }
+            }
+            if (casesVides > 0) {
+                fen.append(casesVides);
+            }
+            if (y < 7) {
+                fen.append("/");
+            }
+        }
+        fen.append(tourBlancs ? " w " : " b ");
+
+        // 3. Roque, En passant, Demi-coups, Coups (Simplifié pour l'instant)
+        // "KQkq" signifie que tout le monde peut roquer. "-" signifie pas de prise en
+        // passant.
+        fen.append("- - 0 1");
+
+        return fen.toString();
+    }
+
 }

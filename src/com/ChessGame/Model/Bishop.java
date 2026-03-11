@@ -1,4 +1,5 @@
 package com.ChessGame.Model;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,22 +10,27 @@ import java.util.List;
 public class Bishop extends Piece {
     /**
      * Constructeur de la classe Bishop
+     * 
      * @param color La couleur de la pièce (Color.WHITE ou Color.BLACK)
      */
     public Bishop(Color color) {
-        super(color,'B'); 
+        super(color, 'b');
     }
 
     /**
-     * Méthode pour obtenir les mouvements valides du Bishop à partir de sa position actuelle
+     * Méthode pour obtenir les mouvements valides du Bishop à partir de sa position
+     * actuelle
+     * 
      * @param position La position actuelle du Bishop sur le plateau
-     * @param board Le plateau de jeu pour vérifier les obstacles et les pièces adverses
-     * @return Une liste de points représentant les positions valides où le Bishop peut se déplacer
+     * @param board    Le plateau de jeu pour vérifier les obstacles et les pièces
+     *                 adverses
+     * @return Une liste de points représentant les positions valides où le Bishop
+     *         peut se déplacer
      */
     @Override
     public List<Point> mouvementsValides(Point position, Board board) {
         List<Point> moves = new ArrayList<>();
-        int[][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}};
+        int[][] directions = { { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } };
 
         for (int[] dir : directions) {
             int x = position.x + dir[0];
@@ -34,7 +40,8 @@ public class Bishop extends Piece {
                 if (cible == null) {
                     moves.add(new Point(x, y));
                 } else {
-                    if (cible.getColor() != this.color) moves.add(new Point(x, y));
+                    if (cible.getColor() != this.color)
+                        moves.add(new Point(x, y));
                     break;
                 }
                 x += dir[0];
@@ -43,5 +50,5 @@ public class Bishop extends Piece {
         }
         return moves;
     }
-    
+
 }

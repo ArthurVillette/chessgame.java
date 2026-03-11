@@ -13,6 +13,8 @@ public class Partie extends Observable {
     private Joueur jNoir;
     private Joueur joueurCourant;
     private Board board;
+    private StockfishClient stockfishClient;
+    private boolean stockfishActif;
 
     /**
      * Constructeur de la classe Partie
@@ -24,6 +26,12 @@ public class Partie extends Observable {
         this.jBlanc = new Joueur(true);
         this.jNoir = new Joueur(false);
         this.joueurCourant = jBlanc;
+        this.stockfishClient = new StockfishClient();
+        this.stockfishActif = this.stockfishClient.demarrerMoteur(Config.get("CHEMIN_STOCKFISH", "stockfish"));
+        if (this.stockfishActif) {
+            this.stockfishClient.envoyerCommande("uci");
+            this.stockfishClient.lireReponseComplete("uciok");
+        }
     }
 
     /**
@@ -115,6 +123,12 @@ public class Partie extends Observable {
         return false;
     }
 
+    /**
+     * Vérifie si le roi est en échec et mat
+     * 
+     * @param joueur Le joueur dont on veut vérifier si le roi est en échec et mat
+     * @return true si le roi est en échec et mat, false sinon
+     */
     public boolean roiEnEchecEtMat(Joueur joueur) {
         if (!roiEnEchec(joueur)) {
             return false;
@@ -142,6 +156,12 @@ public class Partie extends Observable {
         return true;
     }
 
+    /**
+     * Vérifie si le joueur est en pat (aucun coup légal possible mais pas en échec)
+     * 
+     * @param joueur Le joueur dont on veut vérifier le pat
+     * @return true si le joueur est en pat, false sinon
+     */
     public boolean pat(Joueur joueur) {
         if (roiEnEchec(joueur)) {
             return false;
@@ -212,5 +232,50 @@ public class Partie extends Observable {
         }
 
         return false;
+    }
+
+    /**
+     * Demande à Stockfish d'évaluer la position actuelle
+     * 
+     * @return L'évaluation en centipions (positif = Blancs gagnent)
+     */
+    public double evaluerPositionAvecStockfish() {
+        if (!stockfishActif)
+            return 0.0;
+        boolean tourBlancs = joueurCourant.isWhite();
+        String fen = board.toFEN(tourBlancs);
+        System.out.println("FEN généré par le jeu : " + fen);
+
+        stockfishClient.envoyerCommande("position fen " + fen);
+        stockfishClient.envoyerCommande("go depth 10");
+        String reponse = stockfishClient.lireReponseComplete("bestmove");
+
+        double scoreFinal = 0.0;
+        String[] lignes = reponse.split("\n");
+        for (String ligne : lignes) {
+            if (ligne.contains("score cp")) {
+                String[] mots = ligne.split(" ");
+                for (int i = 0; i < mots.length; i++) {
+                    if (mots[i].equals("cp")) {
+                        scoreFinal = Double.parseDouble(mots[i + 1]);
+                        if (!tourBlancs) {
+                            scoreFinal = -scoreFinal;
+                        }
+                    }
+                }
+            } else if (ligne.contains("score mate")) {
+                String[] mots = ligne.split(" ");
+                for (int i = 0; i < mots.length; i++) {
+                    if (mots[i].equals("mate")) {
+                        int coupsAvantMat = Integer.parseInt(mots[i + 1]);
+                        scoreFinal = (coupsAvantMat > 0) ? 10000.0 : -10000.0;
+                        if (!tourBlancs)
+                            scoreFinal = -scoreFinal;
+                    }
+                }
+            }
+        }
+        System.out.println("Score centipions : " + scoreFinal);
+        return scoreFinal;
     }
 }
