@@ -1,44 +1,24 @@
 package com.ChessGame.Model;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import com.ChessGame.Model.plateau.*;
+import java.awt.Color;
 
 /**
- * Classe représentant la pièce de type King (Roi)
+ * Classe représentant le roi dans le jeu d'échecs, avec des fonctionnalités spécifiques telles que le suivi du déplacement pour le roque
+ * et l'utilisation d'un décorateur pour définir les mouvements possibles du roi
  */
 public class King extends Piece {
-    /**
-     * Constructeur de la classe King
-     * 
-     * @param color La couleur de la pièce (Color.WHITE ou Color.BLACK)
-     */
+    private boolean aBouge = false;
+
     public King(Color color) {
-        super(color, 'k');
+        super(color, new DecoratorCasesRoi(null));
     }
 
-    /**
-     * Méthode pour obtenir les mouvements valides du roi à partir de sa position
-     * actuelle
-     * 
-     * @param position La position actuelle du roi sur le plateau
-     * @param board    Le plateau de jeu pour vérifier les mouvements
-     * @return Une liste de points représentant les mouvements valides du roi
-     */
-    @Override
-    public List<Point> mouvementsValides(Point position, Board board) {
-        List<Point> moves = new ArrayList<>();
-        int[][] directions = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } };
+    public boolean aBouge() { return aBouge; }
+    public void setABouge()  { this.aBouge = true; }
 
-        for (int[] dir : directions) {
-            int x = position.x + dir[0];
-            int y = position.y + dir[1];
-            if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-                Piece cible = board.getPiece(x, y);
-                if (cible == null || cible.getColor() != this.color)
-                    moves.add(new Point(x, y));
-            }
-        }
-        return moves;
+    @Override public char getSymbol() { return 'k'; }
+    @Override public String getImagePath() {
+        return color == Color.WHITE ? "/assets/pieces/wk.png" : "/assets/pieces/bk.png";
     }
 }

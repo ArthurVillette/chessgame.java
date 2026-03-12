@@ -7,6 +7,8 @@ import com.ChessGame.Vue.BoardPanel;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.EvaluationPanel;
 import com.ChessGame.Controller.ChessController;
+import com.ChessGame.Vue.PromotionDialog;
+
 import javax.swing.SwingUtilities;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -21,10 +23,13 @@ public class Main {
             Board board = new Board();
             ChessFrame frame = new ChessFrame(board);
             Partie partie = new Partie(board);
-            BoardPanel boardPanel = new BoardPanel(board);
+            //BoardPanel boardPanel = new BoardPanel(board);
             EvaluationPanel evaluationPanel = new EvaluationPanel();
 
-            partie.addObserver(boardPanel);
+            //partie.addObserver(boardPanel);
+            partie.addObserver(frame.getBoardPanel());
+
+            PromotionDialog promotionDialog = new PromotionDialog(partie);
 
             ChessController controller = new ChessController(board, frame, partie);
             frame.getBoardPanel().addMouseListener(controller);
