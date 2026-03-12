@@ -59,38 +59,32 @@ public class ChessController extends MouseAdapter {
                 boardPanel.setSelection(-1, -1);
                 boardPanel.setCasesPossibles(new ArrayList<>());
             }
-            return; // On arrête là
+            return;
         }
 
         int x = clicX / BoardPanel.TILE_SIZE;
         int y = clicY / BoardPanel.TILE_SIZE;
 
-        // boardPanel.setSelection(x, y);
         if (selection == null) {
             Piece piece = model.getPiece(x, y);
             if (piece == null)
                 return;
             if (piece.getColor() != partie.getJoueurCourant().getCouleur())
                 return;
-            // Premier clic : sélectionner une pièce
             if (model.getPiece(x, y) != null) {
                 selection = new Point(x, y);
                 boardPanel.setSelection(x, y);
 
-                // Calcule et affiche les cases possibles
                 List<Point> moves = piece.getMouvementsLegaux(selection, model, partie);
                 boardPanel.setCasesPossibles(moves);
             }
         } else {
-            // deuxieme click
-            // Si on reclique la même case → désélectionner simplement
             if (selection.x == x && selection.y == y) {
                 selection = null;
                 boardPanel.setSelection(-1, -1);
                 boardPanel.setCasesPossibles(new ArrayList<>());
                 return;
             }
-            // Sinon envoyer le coup normalement
             Coup coup = new Coup(selection, new Point(x, y));
             if (partie.coupValide(coup)) {
                 partie.getJoueurCourant().setCoup(coup);
