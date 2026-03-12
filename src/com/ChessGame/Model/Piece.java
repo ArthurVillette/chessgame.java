@@ -1,5 +1,8 @@
 package com.ChessGame.Model;
 
+import com.ChessGame.Model.plateau.Case;
+import com.ChessGame.Model.plateau.DecoratorCasesAccessibles;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +14,8 @@ import java.util.Set;
 public abstract class Piece {
     protected Color color;
     protected char symbol;
+    protected DecoratorCasesAccessibles decorateur;
+
 
     /**
      * Constructeur de la classe Piece
@@ -25,12 +30,41 @@ public abstract class Piece {
     }
 
     /**
+     * Constructeur
+     * @param color     Couleur de la pièce
+     * @param decorateur La chaîne de décorateurs définissant les mouvements
+     */
+    public Piece(Color color, DecoratorCasesAccessibles decorateur) {
+        this.color = color;
+        this.decorateur = decorateur;
+    }
+
+    /**
      * Retourne la couleur de la pièce
-     * 
+     *
      * @return La couleur de la pièce (Color.WHITE ou Color.BLACK)
      */
-    public Color getColor() {
+   /* public Color getColor() {
         return color;
+    }*/
+
+    /**
+     * Initialise le décorateur avec le plateau et cette pièce.
+     * DOIT être appelé dès que la pièce est posée sur le plateau.
+     */
+    public void initDecorateur(Board board) {
+        if (decorateur != null) {
+            decorateur.init(board, this);
+        }
+    }
+
+    /**
+     * Retourne toutes les cases accessibles par cette pièce depuis une position.
+     * Remplace l'ancienne méthode mouvementsValides().
+     */
+    public ArrayList<Case> getCasesAccessibles(Case position) {
+        if (decorateur == null) return new ArrayList<>();
+        return decorateur.getCasesAccessibles(position);
     }
 
     /**
@@ -39,20 +73,20 @@ public abstract class Piece {
      * @return Le symbole représentant la pièce (ex: 'P' pour Pawn, 'K' pour King,
      *         etc.)
      */
-    public char getSymbol() {
+    /*public char getSymbol() {
         return symbol;
-    }
+    }*/
 
     /**
      * Retourne le chemin de l'image représentant la pièce
      * 
      * @return Le chemin de l'image (ex: "/assets/pieces/wP.png" pour un pion blanc)
      */
-    public String getImagePath() {
+    /*public String getImagePath() {
         String colorP = (color == Color.WHITE) ? "w" : "b";
         return "/assets/pieces/" + colorP + symbol + ".png";
 
-    }
+    }*/
 
     /**
      * Méthode abstraite à implémenter dans les classes filles pour retourner les
@@ -63,7 +97,23 @@ public abstract class Piece {
      * @return Une liste de points représentant les positions valides où la pièce
      *         peut se déplacer
      */
-    public abstract List<Point> mouvementsValides(Point position, Board board);
+    //public abstract List<Point> mouvementsValides(Point position, Board board);
+
+
+    //-----
+    /**
+     * Compatibilité avec l'ancien code : retourne les mouvements sous forme de List<Point>.
+     * Utilisé par Partie et ChessController.
+     */
+    public List<Point> mouvementsValides(Point pos, Board board) {
+        initDecorateur(board);
+        ArrayList<Case> cases = getCasesAccessibles(new Case(pos.x, pos.y));
+        List<Point> points = new ArrayList<>();
+        for (Case c : cases) {
+            points.add(c.toPoint());
+        }
+        return points;
+    }
 
     /**
      * Retourne les mouvements légaux de la pièce en filtrant les mouvements valides
@@ -86,4 +136,14 @@ public abstract class Piece {
 
         return coupsLegaux;
     }
+
+
+
+    public Color getColor() { return color; }
+
+    public abstract char getSymbol();
+
+    public abstract String getImagePath();
+
+
 }

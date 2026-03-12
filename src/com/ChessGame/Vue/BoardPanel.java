@@ -3,6 +3,7 @@ package com.ChessGame.Vue;
 import javax.swing.*;
 import com.ChessGame.Model.Board;
 import java.awt.*;
+import com.ChessGame.Model.EvenementMouvement;
 import com.ChessGame.Model.Piece;
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -46,9 +47,20 @@ public class BoardPanel extends JPanel implements Observer {
         this.repaint();
     }
 
+
+    /**
+     * Met à jour la vue du plateau d'échecs lorsque le modèle change
+     * Réagit uniquement aux EvenementMouvement → repaint.
+     * 
+     * @param o   l'objet observable (Partie) qui a changé
+     * @param arg un argument optionnel (non utilisé ici)
+     **/
+    
     @Override
-    public void update(Observable o, Object arg) {
-        SwingUtilities.invokeLater(() -> repaint());
+    public void update(java.util.Observable o, Object arg) {
+        if (arg instanceof EvenementMouvement) {
+            SwingUtilities.invokeLater(this::repaint);
+        }
     }
 
     public void setCasesPossibles(List<Point> cases) {
