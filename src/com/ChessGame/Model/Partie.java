@@ -13,27 +13,58 @@ public class Partie extends Observable {
     private Joueur jNoir;
     private Joueur joueurCourant;
     private Board board;
-    private StockfishClient stockfishClient;
     private boolean stockfishActif;
     private Piece choixPromotion = null;
+    private boolean villetteActif;
+    private IAClient moteurStockfish;
+    private IAClient moteurVillette;
+    private boolean contreIA;
+    private boolean humainEstBlanc;
 
 
     /**
      * Constructeur de la classe Partie
+     * * @param board Le plateau de jeu à utiliser pour la partie
      * 
-     * @param board Le plateau de jeu à utiliser pour la partie
+     * @param contreIA       Indique si la partie est contre l'IA
+     * @param humainEstBlanc Indique si le joueur humain joue avec les pièces
+     *                       blanches
      */
-    public Partie(Board board) {
+    public Partie(Board board, boolean contreIA, boolean humainEstBlanc) {
         this.board = board;
-        this.jBlanc = new Joueur(true);
-        this.jNoir = new Joueur(false);
-        this.joueurCourant = jBlanc;
-        this.stockfishClient = new StockfishClient();
-        this.stockfishActif = this.stockfishClient.demarrerMoteur(Config.get("CHEMIN_STOCKFISH", "stockfish"));
+        this.contreIA = contreIA;
+        this.humainEstBlanc = humainEstBlanc;
+        this.moteurStockfish = new IAClient();
+        this.stockfishActif = this.moteurStockfish.demarrerMoteur(Config.get("CHEMIN_STOCKFISH", "stockfish"));
         if (this.stockfishActif) {
-            this.stockfishClient.envoyerCommande("uci");
-            this.stockfishClient.lireReponseComplete("uciok");
+            this.moteurStockfish.envoyerCommande("uci");
+            this.moteurStockfish.lireReponseComplete("uciok");
         }
+
+        if (this.contreIA) {
+            this.moteurVillette = new IAClient();
+            this.villetteActif = this.moteurVillette
+                    .demarrerMoteur(Config.get("CHEMIN_VILLETTE", "./lanceur_villette.sh"));
+            if (this.villetteActif) {
+                this.moteurVillette.envoyerCommande("uci");
+                this.moteurVillette.lireReponseComplete("uciok");
+            }
+        }
+
+        if (!this.contreIA) {
+            this.jBlanc = new Joueur(true);
+            this.jNoir = new Joueur(false);
+        } else {
+            if (this.humainEstBlanc) {
+                this.jBlanc = new Joueur(true);
+                this.jNoir = new JoueurIA(false, this.moteurVillette, this);
+            } else {
+                this.jBlanc = new JoueurIA(true, this.moteurVillette, this);
+                this.jNoir = new Joueur(false);
+            }
+        }
+
+        this.joueurCourant = jBlanc;
     }
 
     /**
@@ -246,7 +277,7 @@ public class Partie extends Observable {
             Board copieBoard = new Board(board);
             copieBoard.setPiece(move.x, move.y, copieBoard.getPiece(posRoi.x, posRoi.y));
             copieBoard.setPiece(posRoi.x, posRoi.y, null);
-            Partie partieTest = new Partie(copieBoard);
+            Partie partieTest = new Partie(copieBoard, this.contreIA, this.humainEstBlanc);
             if (!partieTest.roiEnEchec(joueur)) {
                 return false;
             }
@@ -273,7 +304,7 @@ public class Partie extends Observable {
                         Board copieBoard = new Board(board);
                         copieBoard.setPiece(move.x, move.y, copieBoard.getPiece(i, j));
                         copieBoard.setPiece(i, j, null);
-                        Partie partieTest = new Partie(copieBoard);
+                        Partie partieTest = new Partie(copieBoard, this.contreIA, this.humainEstBlanc);
                         if (!partieTest.roiEnEchec(joueur)) {
                             return false;
                         }
@@ -344,9 +375,9 @@ public class Partie extends Observable {
         String fen = board.toFEN(tourBlancs);
         System.out.println("FEN généré par le jeu : " + fen);
 
-        stockfishClient.envoyerCommande("position fen " + fen);
-        stockfishClient.envoyerCommande("go depth 10");
-        String reponse = stockfishClient.lireReponseComplete("bestmove");
+        moteurStockfish.envoyerCommande("position fen " + fen);
+        moteurStockfish.envoyerCommande("go depth 10");
+        String reponse = moteurStockfish.lireReponseComplete("bestmove");
 
         double scoreFinal = 0.0;
         String[] lignes = reponse.split("\n");

@@ -29,3 +29,6 @@ replay_pid*
 
 #stockfish
 /moteur/stockfish/
+
+#environnement de développement
+/model_VILLETTE/env_villette/

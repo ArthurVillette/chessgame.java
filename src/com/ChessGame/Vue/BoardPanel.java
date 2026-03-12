@@ -1,11 +1,8 @@
 package com.ChessGame.Vue;
 
 import javax.swing.*;
-
 import com.ChessGame.Model.Board;
-
 import java.awt.*;
-
 import com.ChessGame.Model.EvenementMouvement;
 import com.ChessGame.Model.Piece;
 import javax.imageio.ImageIO;
@@ -20,6 +17,7 @@ import java.util.List;
 public class BoardPanel extends JPanel implements Observer {
     private Board board;
     public static final int TILE_SIZE = 80;
+    public static final int MARGE = 30; // Notre espace pour le texte
 
     private int selectedX = -1;
     private int selectedY = -1;
@@ -29,20 +27,19 @@ public class BoardPanel extends JPanel implements Observer {
 
     /**
      * Constructeur de la vue du plateau d'échecs
-     * 
-     * @param board Le modèle du plateau d'échecs
+     * * @param board Le modèle du plateau d'échecs
      */
     public BoardPanel(Board board) {
         this.board = board;
-        setPreferredSize(new Dimension(8 * TILE_SIZE, 8 * TILE_SIZE));
+        setPreferredSize(new Dimension(8 * TILE_SIZE + 2 * MARGE, 8 * TILE_SIZE + 2 * MARGE));
         loadAllImages();
     }
 
     /**
-     * Met à jour la sélection de la case cliquée
+     * Met à jour la sélection de la case et redessine le plateau
      * 
-     * @param x les coordonnées x de la case sélectionnée
-     * @param y les coordonnées y de la case sélectionnée
+     * @param x La coordonnée x de la case sélectionnée
+     * @param y La coordonnée y de la case sélectionnée
      */
     public void setSelection(int x, int y) {
         this.selectedX = x;
@@ -50,17 +47,15 @@ public class BoardPanel extends JPanel implements Observer {
         this.repaint();
     }
 
+
     /**
      * Met à jour la vue du plateau d'échecs lorsque le modèle change
      * Réagit uniquement aux EvenementMouvement → repaint.
      * 
      * @param o   l'objet observable (Partie) qui a changé
      * @param arg un argument optionnel (non utilisé ici)
-     */
-    /*@Override
-    public void update(Observable o, Object arg) {
-        SwingUtilities.invokeLater(() -> repaint());
-    }*/
+     **/
+    
     @Override
     public void update(java.util.Observable o, Object arg) {
         if (arg instanceof EvenementMouvement) {
@@ -68,48 +63,52 @@ public class BoardPanel extends JPanel implements Observer {
         }
     }
 
-    /**
-     * Met à jour la liste des cases possibles pour le déplacement de la pièce
-     * sélectionnée
-     * 
-     * @param cases la liste des cases possibles pour le déplacement de la pièce
-     *              sélectionnée
-     */
     public void setCasesPossibles(List<Point> cases) {
         this.casesPossibles = cases;
         repaint();
     }
 
-    /**
-     * Dessine les cases possibles pour le déplacement de la pièce sélectionnée
-     * 
-     * @param g le graph pour dessiner les cases possibles
-     */
-    private void drawCasesPossibles(Graphics g) {
-        g.setColor(new Color(0, 0, 255, 150));
-        for (Point p : casesPossibles) {
-            g.fillRect(p.x * TILE_SIZE, p.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-        }
-    }
-
-    /**
-     * Dessine le plateau d'échecs et la sélection
-     * 
-     * @param g le graph pour dessiner le plateau et la sélection
-     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         drawGrid(g);
+        drawCoordinates(g); // NOUVEAU : Dessin du texte
         drawSelection(g);
         drawCasesPossibles(g);
         drawPieces(g);
     }
 
     /**
+     * Dessine les coordonnées (a-h et 1-8) autour du plateau
+     * 
+     * @param g Le contexte graphique pour dessiner les coordonnées
+     */
+    private void drawCoordinates(Graphics g) {
+        g.setColor(Color.BLACK); // Ou Color.WHITE si votre fond de fenêtre est sombre
+        g.setFont(new Font("Arial", Font.BOLD, 14));
+        FontMetrics fm = g.getFontMetrics();
+
+        for (int i = 0; i < 8; i++) {
+            // Dessin des lettres (a-h) en bas
+            String lettre = String.valueOf((char) ('a' + i));
+            int textWidth = fm.stringWidth(lettre);
+            int xLettre = MARGE + (i * TILE_SIZE) + (TILE_SIZE - textWidth) / 2;
+            int yLettre = MARGE + (8 * TILE_SIZE) + 20; // 20 pixels sous le plateau
+            g.drawString(lettre, xLettre, yLettre);
+
+            // Dessin des chiffres (8-1) à gauche
+            String chiffre = String.valueOf(8 - i);
+            int textHeight = fm.getAscent();
+            int xChiffre = 10; // 10 pixels depuis le bord gauche de la fenêtre
+            int yChiffre = MARGE + (i * TILE_SIZE) + (TILE_SIZE + textHeight) / 2 - 4;
+            g.drawString(chiffre, xChiffre, yChiffre);
+        }
+    }
+
+    /**
      * Dessine la grille du plateau d'échecs
      * 
-     * @param g le graph pour dessiner la grille
+     * @param g Le contexte graphique pour dessiner la grille
      */
     private void drawGrid(Graphics g) {
         for (int row = 0; row < 8; row++) {
@@ -118,20 +117,36 @@ public class BoardPanel extends JPanel implements Observer {
                     g.setColor(new Color(235, 235, 208));
                 else
                     g.setColor(new Color(119, 148, 85));
-                g.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+
+                // MODIFICATION : Ajout de la MARGE au X et au Y
+                g.fillRect(MARGE + col * TILE_SIZE, MARGE + row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
     }
 
     /**
-     * Dessine un carré rouge semi-transparent sur la case sélectionnée
+     * Dessine la case sélectionnée en rouge transparent
      * 
-     * @param g le graph pour dessiner la sélection
+     * @param g Le contexte graphique pour dessiner la sélection
      */
     private void drawSelection(Graphics g) {
         if (selectedX != -1 && selectedY != -1) {
             g.setColor(new Color(255, 0, 0, 150));
-            g.fillRect(selectedX * TILE_SIZE, selectedY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            // MODIFICATION : Ajout de la MARGE
+            g.fillRect(MARGE + selectedX * TILE_SIZE, MARGE + selectedY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
+    }
+
+    /**
+     * Dessine les cases possibles pour le mouvement d'une pièce en bleu transparent
+     * 
+     * @param g Le contexte graphique pour dessiner les cases possibles
+     */
+    private void drawCasesPossibles(Graphics g) {
+        g.setColor(new Color(0, 0, 255, 150));
+        for (Point p : casesPossibles) {
+            // MODIFICATION : Ajout de la MARGE
+            g.fillRect(MARGE + p.x * TILE_SIZE, MARGE + p.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
     }
 
@@ -140,7 +155,7 @@ public class BoardPanel extends JPanel implements Observer {
      */
     private void loadAllImages() {
         String[] colors = { "w", "b" };
-        String[] pieces = { "p", "r", "n", "b", "q", "k" }; // Symboles utilisés dans tes classes
+        String[] pieces = { "p", "r", "n", "b", "q", "k" };
 
         for (String c : colors) {
             for (String p : pieces) {
@@ -156,9 +171,9 @@ public class BoardPanel extends JPanel implements Observer {
     }
 
     /**
-     * Dessine les pièces sur le plateau d'échecs
+     * Dessine les pièces sur le plateau en utilisant les images chargées
      * 
-     * @param g le graph pour dessiner les pièces
+     * @param g Le contexte graphique pour dessiner les pièces
      */
     private void drawPieces(Graphics g) {
         for (int row = 0; row < 8; row++) {
@@ -167,14 +182,16 @@ public class BoardPanel extends JPanel implements Observer {
                 if (piece != null) {
                     Image img = imageCache.get(piece.getImagePath());
                     if (img != null) {
-                        g.drawImage(img, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, this);
+                        // MODIFICATION : Ajout de la MARGE
+                        g.drawImage(img, MARGE + col * TILE_SIZE, MARGE + row * TILE_SIZE, TILE_SIZE, TILE_SIZE, this);
                     } else {
                         g.setColor(piece.getColor());
-                        g.drawString(String.valueOf(piece.getSymbol()), col * TILE_SIZE + 35, row * TILE_SIZE + 45);
+                        // MODIFICATION : Ajout de la MARGE
+                        g.drawString(String.valueOf(piece.getSymbol()), MARGE + col * TILE_SIZE + 35,
+                                MARGE + row * TILE_SIZE + 45);
                     }
                 }
             }
         }
     }
-
 }
