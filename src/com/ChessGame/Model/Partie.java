@@ -21,7 +21,6 @@ public class Partie extends Observable {
     private boolean contreIA;
     private boolean humainEstBlanc;
 
-
     /**
      * Constructeur de la classe Partie
      * * @param board Le plateau de jeu à utiliser pour la partie
@@ -91,23 +90,6 @@ public class Partie extends Observable {
     }
 
     /**
-     * Applique un coup sur le plateau de jeu
-     * 
-     * @param coup Le coup à appliquer
-     */
-    /*public void appliquerCoup(Coup coup) {
-        Piece piece = board.getPiece(coup.depart.x, coup.depart.y);
-        if (piece != null) {
-            board.setPiece(coup.arrivee.x, coup.arrivee.y, piece);
-            board.setPiece(coup.depart.x, coup.depart.y, null);
-
-            setChanged();
-            notifyObservers();
-        }
-
-    }*/
-
-    /**
      * Applique un coup sur le plateau, gère aussi :
      * - la prise en passant (supprime le pion capturé)
      * - le roque (déplace aussi la tour)
@@ -116,16 +98,18 @@ public class Partie extends Observable {
      */
     /**
      * Applique un coup. Gère : prise en passant, roque, promotion.
-     * Pour la promotion, notifie la Vue via Observer et attend son choix (wait/notify).
+     * Pour la promotion, notifie la Vue via Observer et attend son choix
+     * (wait/notify).
      */
     public void appliquerCoup(Coup coup) {
         Piece piece = board.getPiece(coup.depart.x, coup.depart.y);
-        if (piece == null) return;
+        if (piece == null)
+            return;
 
         // --- PRISE EN PASSANT ---
         if (piece instanceof Pawn) {
             boolean captureEnDiagonale = (coup.arrivee.x != coup.depart.x);
-            boolean caseArriveeVide    = (board.getPiece(coup.arrivee.x, coup.arrivee.y) == null);
+            boolean caseArriveeVide = (board.getPiece(coup.arrivee.x, coup.arrivee.y) == null);
             if (captureEnDiagonale && caseArriveeVide) {
                 board.setPiece(coup.arrivee.x, coup.depart.y, null);
             }
@@ -139,17 +123,20 @@ public class Partie extends Observable {
                 Piece tour = board.getPiece(7, y);
                 board.setPiece(5, y, tour);
                 board.setPiece(7, y, null);
-                if (tour instanceof Rook) ((Rook) tour).setABouge();
+                if (tour instanceof Rook)
+                    ((Rook) tour).setABouge();
             } else if (deltaX == -2) {
                 Piece tour = board.getPiece(0, y);
                 board.setPiece(3, y, tour);
                 board.setPiece(0, y, null);
-                if (tour instanceof Rook) ((Rook) tour).setABouge();
+                if (tour instanceof Rook)
+                    ((Rook) tour).setABouge();
             }
             ((King) piece).setABouge();
         }
 
-        if (piece instanceof Rook) ((Rook) piece).setABouge();
+        if (piece instanceof Rook)
+            ((Rook) piece).setABouge();
 
         // Déplacer la pièce
         board.setPiece(coup.arrivee.x, coup.arrivee.y, piece);
@@ -183,7 +170,11 @@ public class Partie extends Observable {
 
         // Bloquer le thread du jeu jusqu'au choix du joueur
         while (choixPromotion == null) {
-            try { wait(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
 
         // Placer la pièce choisie sur le plateau
@@ -254,32 +245,36 @@ public class Partie extends Observable {
 
     /**
      * Vérifie si le roi est en échec et mat
+     * * @param joueur Le joueur dont on veut vérifier si le roi est en échec et mat
      * 
-     * @param joueur Le joueur dont on veut vérifier si le roi est en échec et mat
      * @return true si le roi est en échec et mat, false sinon
      */
     public boolean roiEnEchecEtMat(Joueur joueur) {
         if (!roiEnEchec(joueur)) {
             return false;
         }
-        Point posRoi = null;
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Piece p = board.getPiece(i, j);
-                if (p instanceof King && p.getColor().equals(joueur.getCouleur())) {
-                    posRoi = new Point(i, j);
-                    break;
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Piece piece = board.getPiece(x, y);
+                if (piece != null && piece.getColor().equals(joueur.getCouleur())) {
+                    Point posDepart = new Point(x, y);
+                    List<Point> mouvementsPossibles = piece.mouvementsValides(posDepart, board);
+
+                    for (Point arrivee : mouvementsPossibles) {
+                        Piece pieceMangee = board.getPiece(arrivee.x, arrivee.y);
+
+                        board.setPiece(arrivee.x, arrivee.y, piece);
+                        board.setPiece(posDepart.x, posDepart.y, null);
+
+                        boolean sauveLeRoi = !roiEnEchec(joueur);
+
+                        board.setPiece(posDepart.x, posDepart.y, piece);
+                        board.setPiece(arrivee.x, arrivee.y, pieceMangee);
+                        if (sauveLeRoi) {
+                            return false;
+                        }
+                    }
                 }
-            }
-        }
-        List<Point> mouvementsRoi = board.getPiece(posRoi.x, posRoi.y).mouvementsValides(posRoi, board);
-        for (Point move : mouvementsRoi) {
-            Board copieBoard = new Board(board);
-            copieBoard.setPiece(move.x, move.y, copieBoard.getPiece(posRoi.x, posRoi.y));
-            copieBoard.setPiece(posRoi.x, posRoi.y, null);
-            Partie partieTest = new Partie(copieBoard, this.contreIA, this.humainEstBlanc);
-            if (!partieTest.roiEnEchec(joueur)) {
-                return false;
             }
         }
         return true;
@@ -295,23 +290,30 @@ public class Partie extends Observable {
         if (roiEnEchec(joueur)) {
             return false;
         }
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Piece p = board.getPiece(i, j);
-                if (p != null && p.getColor().equals(joueur.getCouleur())) {
-                    List<Point> mouvements = p.mouvementsValides(new Point(i, j), board);
-                    for (Point move : mouvements) {
-                        Board copieBoard = new Board(board);
-                        copieBoard.setPiece(move.x, move.y, copieBoard.getPiece(i, j));
-                        copieBoard.setPiece(i, j, null);
-                        Partie partieTest = new Partie(copieBoard, this.contreIA, this.humainEstBlanc);
-                        if (!partieTest.roiEnEchec(joueur)) {
+
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Piece piece = board.getPiece(x, y);
+
+                if (piece != null && piece.getColor().equals(joueur.getCouleur())) {
+                    Point posDepart = new Point(x, y);
+                    List<Point> mouvementsPossibles = piece.mouvementsValides(posDepart, board);
+                    for (Point arrivee : mouvementsPossibles) {
+                        Piece pieceMangee = board.getPiece(arrivee.x, arrivee.y);
+                        board.setPiece(arrivee.x, arrivee.y, piece);
+                        board.setPiece(posDepart.x, posDepart.y, null);
+                        boolean coupLegalTrouve = !roiEnEchec(joueur);
+
+                        board.setPiece(posDepart.x, posDepart.y, piece);
+                        board.setPiece(arrivee.x, arrivee.y, pieceMangee);
+                        if (coupLegalTrouve) {
                             return false;
                         }
                     }
                 }
             }
         }
+
         return true;
     }
 

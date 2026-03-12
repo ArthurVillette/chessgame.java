@@ -5,6 +5,7 @@
 - Avoir java sur son PC
 - Installé Stockfish sur votre PC
 - Dans un fichier .env a la racine du projet ajouté le chemin dans votre variable: CHEMIN_STOCKFISH
+- pour jouer avec l'ia mettez le chemin en fonction de votre pc pour linux: CHEMIN_VILLETTE= ./lanceur_villette.sh et pour windows CHEMIN_VILLETTE=jsp
 
 ## Lancement 
 
