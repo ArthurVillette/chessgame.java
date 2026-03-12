@@ -7,6 +7,7 @@ import java.awt.*;
  */
 public class Board {
     private Piece[][] board;
+    private Coup dernierCoup = null;
 
     /**
      * Constructeur de la classe Board qui initialise le plateau d'échecs avec les
@@ -62,6 +63,9 @@ public class Board {
             board[lin][1] = new Pawn(Color.BLACK);
         }
     }
+
+    public Coup getDernierCoup() { return dernierCoup; }
+    public void setDernierCoup(Coup coup) { this.dernierCoup = coup; }
 
     /**
      * Récupère la pièce à une position donnée sur le plateau

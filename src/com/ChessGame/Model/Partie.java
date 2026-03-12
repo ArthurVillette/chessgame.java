@@ -14,11 +14,13 @@ public class Partie extends Observable {
     private Joueur joueurCourant;
     private Board board;
     private boolean stockfishActif;
+    private Piece choixPromotion = null;
     private boolean villetteActif;
     private IAClient moteurStockfish;
     private IAClient moteurVillette;
     private boolean contreIA;
     private boolean humainEstBlanc;
+
 
     /**
      * Constructeur de la classe Partie
@@ -93,7 +95,7 @@ public class Partie extends Observable {
      * 
      * @param coup Le coup à appliquer
      */
-    public void appliquerCoup(Coup coup) {
+    /*public void appliquerCoup(Coup coup) {
         Piece piece = board.getPiece(coup.depart.x, coup.depart.y);
         if (piece != null) {
             board.setPiece(coup.arrivee.x, coup.arrivee.y, piece);
@@ -103,6 +105,102 @@ public class Partie extends Observable {
             notifyObservers();
         }
 
+    }*/
+
+    /**
+     * Applique un coup sur le plateau, gère aussi :
+     * - la prise en passant (supprime le pion capturé)
+     * - le roque (déplace aussi la tour)
+     * - la promotion (popup pour choisir la pièce)
+     * - le flag aBouge sur Roi et Tour
+     */
+    /**
+     * Applique un coup. Gère : prise en passant, roque, promotion.
+     * Pour la promotion, notifie la Vue via Observer et attend son choix (wait/notify).
+     */
+    public void appliquerCoup(Coup coup) {
+        Piece piece = board.getPiece(coup.depart.x, coup.depart.y);
+        if (piece == null) return;
+
+        // --- PRISE EN PASSANT ---
+        if (piece instanceof Pawn) {
+            boolean captureEnDiagonale = (coup.arrivee.x != coup.depart.x);
+            boolean caseArriveeVide    = (board.getPiece(coup.arrivee.x, coup.arrivee.y) == null);
+            if (captureEnDiagonale && caseArriveeVide) {
+                board.setPiece(coup.arrivee.x, coup.depart.y, null);
+            }
+        }
+
+        // --- ROQUE ---
+        if (piece instanceof King) {
+            int deltaX = coup.arrivee.x - coup.depart.x;
+            int y = coup.depart.y;
+            if (deltaX == 2) {
+                Piece tour = board.getPiece(7, y);
+                board.setPiece(5, y, tour);
+                board.setPiece(7, y, null);
+                if (tour instanceof Rook) ((Rook) tour).setABouge();
+            } else if (deltaX == -2) {
+                Piece tour = board.getPiece(0, y);
+                board.setPiece(3, y, tour);
+                board.setPiece(0, y, null);
+                if (tour instanceof Rook) ((Rook) tour).setABouge();
+            }
+            ((King) piece).setABouge();
+        }
+
+        if (piece instanceof Rook) ((Rook) piece).setABouge();
+
+        // Déplacer la pièce
+        board.setPiece(coup.arrivee.x, coup.arrivee.y, piece);
+        board.setPiece(coup.depart.x, coup.depart.y, null);
+        board.setDernierCoup(coup);
+
+        // --- PROMOTION ---
+        if (piece instanceof Pawn) {
+            int lignePromotion = piece.getColor().equals(Color.WHITE) ? 0 : 7;
+            if (coup.arrivee.y == lignePromotion) {
+                demanderPromotion(coup.arrivee.x, coup.arrivee.y, piece.getColor());
+                return;
+            }
+        }
+
+        setChanged();
+        notifyObservers(new EvenementMouvement());
+    }
+
+    /**
+     * Notifie PromotionDialog via EvenementPromotion, puis BLOQUE
+     * jusqu'à ce que setChoixPromotion() soit appelé.
+     * Même pattern que Joueur.getCoup().
+     */
+    private synchronized void demanderPromotion(int x, int y, Color couleur) {
+        choixPromotion = null;
+
+        // Notifier la Vue → PromotionDialog affiche la popup
+        setChanged();
+        notifyObservers(new EvenementPromotion(x, y, couleur));
+
+        // Bloquer le thread du jeu jusqu'au choix du joueur
+        while (choixPromotion == null) {
+            try { wait(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        }
+
+        // Placer la pièce choisie sur le plateau
+        board.setPiece(x, y, choixPromotion);
+
+        // Notifier le mouvement pour que BoardPanel repeigne avec la nouvelle pièce
+        setChanged();
+        notifyObservers(new EvenementMouvement());
+    }
+
+    /**
+     * Appelé par PromotionDialog pour fournir la pièce choisie.
+     * Débloque demanderPromotion().
+     */
+    public synchronized void setChoixPromotion(Piece piece) {
+        this.choixPromotion = piece;
+        notify();
     }
 
     /**

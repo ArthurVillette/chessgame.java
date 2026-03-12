@@ -8,6 +8,8 @@ import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.EvaluationPanel;
 import com.ChessGame.Vue.MenuDemarrage; // N'oubliez pas l'import du menu !
 import com.ChessGame.Controller.ChessController;
+import com.ChessGame.Vue.PromotionDialog;
+
 import javax.swing.SwingUtilities;
 
 /**
@@ -35,7 +37,10 @@ public class Main {
             BoardPanel boardPanel = frame.getBoardPanel();
             EvaluationPanel evaluationPanel = new EvaluationPanel();
 
-            partie.addObserver(boardPanel);
+            //partie.addObserver(boardPanel);
+            partie.addObserver(frame.getBoardPanel());
+
+            PromotionDialog promotionDialog = new PromotionDialog(partie);
 
             ChessController controller = new ChessController(board, frame, partie);
             frame.getBoardPanel().addMouseListener(controller);
