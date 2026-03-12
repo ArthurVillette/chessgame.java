@@ -32,3 +32,6 @@ replay_pid*
 
 #environnement de développement
 /model_VILLETTE/env_villette/
+
+#historique 
+/historique/*

@@ -1,6 +1,7 @@
 package com.ChessGame.Model;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
@@ -20,6 +21,8 @@ public class Partie extends Observable {
     private IAClient moteurVillette;
     private boolean contreIA;
     private boolean humainEstBlanc;
+    private List<String> historiqueCoups = new ArrayList<>();
+    private boolean fichiersGeneres = false;
 
     /**
      * Constructeur de la classe Partie
@@ -90,17 +93,11 @@ public class Partie extends Observable {
     }
 
     /**
-     * Applique un coup sur le plateau, gère aussi :
-     * - la prise en passant (supprime le pion capturé)
-     * - le roque (déplace aussi la tour)
-     * - la promotion (popup pour choisir la pièce)
-     * - le flag aBouge sur Roi et Tour
-     */
-    /**
-     * Applique un coup. Gère : prise en passant, roque, promotion.
-     * Pour la promotion, notifie la Vue via Observer et attend son choix
-     * (wait/notify).
-     */
+     * Applique un coup sur le plateau de jeu, en gérant les règles spéciales
+     * (prise en passant, roque, promotion) et en notifiant les observateurs
+     * 
+     * @param coup Le coup à appliquer sur le plateau
+     **/
     public void appliquerCoup(Coup coup) {
         Piece piece = board.getPiece(coup.depart.x, coup.depart.y);
         if (piece == null)
@@ -142,6 +139,14 @@ public class Partie extends Observable {
         board.setPiece(coup.arrivee.x, coup.arrivee.y, piece);
         board.setPiece(coup.depart.x, coup.depart.y, null);
         board.setDernierCoup(coup);
+
+        char colDep = (char) ('a' + coup.depart.x);
+        int ligDep = 8 - coup.depart.y;
+        char colArr = (char) ('a' + coup.arrivee.x);
+        int ligArr = 8 - coup.arrivee.y;
+
+        String coupTexte = "" + colDep + ligDep + colArr + ligArr;
+        historiqueCoups.add(coupTexte);
 
         // --- PROMOTION ---
         if (piece instanceof Pawn) {
@@ -350,18 +355,21 @@ public class Partie extends Observable {
     public boolean estTerminee() {
         if (roiEnEchecEtMat(jBlanc)) {
             System.out.println("Échec et mat ! Les noirs gagnent !");
+            genererFichiersFinDePartie("0-1");
             return true;
         } else if (roiEnEchecEtMat(jNoir)) {
             System.out.println("Échec et mat ! Les blancs gagnent !");
+            genererFichiersFinDePartie("1-0");
             return true;
         } else if (pat(jBlanc)) {
             System.out.println("Pat ! La partie est nulle !");
+            genererFichiersFinDePartie("1/2-1/2");
             return true;
         } else if (pat(jNoir)) {
             System.out.println("Pat ! La partie est nulle !");
+            genererFichiersFinDePartie("1/2-1/2");
             return true;
         }
-
         return false;
     }
 
@@ -408,5 +416,65 @@ public class Partie extends Observable {
         }
         System.out.println("Score centipions : " + scoreFinal);
         return scoreFinal;
+    }
+
+    /**
+     * Génère la fiche lisible (.txt) et le fichier d'importation web (.pgn)
+     * pour la partie terminée, en utilisant l'historique des coups joués.
+     * 
+     * @param resultat Le résultat final de la partie ("1-0", "0-1", "1/2-1/2")
+     */
+    private void genererFichiersFinDePartie(String resultat) {
+        if (fichiersGeneres)
+            return;
+        fichiersGeneres = true;
+
+        try {
+            String numeroPartie = String.format("%04d", new java.io.File("./historique/").listFiles().length + 1);
+            java.io.FileWriter txtWriter = new java.io.FileWriter("./historique/fiche_coups_" + numeroPartie + ".txt");
+            txtWriter.write("=== HISTORIQUE DE LA PARTIE ===\n\n");
+            for (int i = 0; i < historiqueCoups.size(); i++) {
+                if (i % 2 == 0) {
+                    txtWriter.write(((i / 2) + 1) + ". Blanc : " + historiqueCoups.get(i) + " \t");
+                } else {
+                    txtWriter.write("Noir : " + historiqueCoups.get(i) + "\n");
+                }
+            }
+            txtWriter.write("\nRésultat final : " + resultat);
+            txtWriter.close();
+
+            java.io.FileWriter pgnWriter = new java.io.FileWriter(
+                    "./historique/partie_export_" + numeroPartie + ".pgn");
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy.MM.dd");
+            String date = sdf.format(new java.util.Date());
+
+            String nomBlanc = humainEstBlanc ? "Humain" : (contreIA ? "VILLETTE" : "Humain Noir");
+            String nomNoir = !humainEstBlanc ? "Humain" : (contreIA ? "VILLETTE" : "Humain Noir");
+
+            // En-têtes standards du format PGN
+            pgnWriter.write("[Event \"Partie Locale vs Villette\"]\n");
+            pgnWriter.write("[Site \"Mon Ordinateur\"]\n");
+            pgnWriter.write("[Date \"" + date + "\"]\n");
+            pgnWriter.write("[Round \"1\"]\n");
+            pgnWriter.write("[White \"" + nomBlanc + "\"]\n");
+            pgnWriter.write("[Black \"" + nomNoir + "\"]\n");
+            pgnWriter.write("[Result \"" + resultat + "\"]\n\n");
+
+            // Écriture des coups à la suite
+            for (int i = 0; i < historiqueCoups.size(); i++) {
+                if (i % 2 == 0)
+                    pgnWriter.write(((i / 2) + 1) + ". ");
+                pgnWriter.write(historiqueCoups.get(i) + " ");
+            }
+            pgnWriter.write(resultat);
+            pgnWriter.close();
+
+            System.out.println(
+                    "✅ Fichiers générés avec succès : 'fiche_coups_" + numeroPartie + ".txt' et 'partie_export_"
+                            + numeroPartie + ".pgn'");
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la sauvegarde : " + e.getMessage());
+        }
     }
 }
