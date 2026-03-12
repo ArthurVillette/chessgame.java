@@ -44,7 +44,6 @@ public class Main {
             Thread threadJeu = new Thread(jeuController);
             threadJeu.setDaemon(true);
             threadJeu.start();
-
             frame.setVisible(true);
 
             System.out.println("Le jeu d'échecs est démarré avec succès !");

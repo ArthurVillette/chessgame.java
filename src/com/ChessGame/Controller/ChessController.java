@@ -51,8 +51,19 @@ public class ChessController extends MouseAdapter {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        int x = e.getX() / boardPanel.TILE_SIZE;
-        int y = e.getY() / boardPanel.TILE_SIZE;
+        int clicX = e.getX() - BoardPanel.MARGE;
+        int clicY = e.getY() - BoardPanel.MARGE;
+        if (clicX < 0 || clicY < 0 || clicX >= 8 * BoardPanel.TILE_SIZE || clicY >= 8 * BoardPanel.TILE_SIZE) {
+            if (selection != null) {
+                selection = null;
+                boardPanel.setSelection(-1, -1);
+                boardPanel.setCasesPossibles(new ArrayList<>());
+            }
+            return; // On arrête là
+        }
+
+        int x = clicX / BoardPanel.TILE_SIZE;
+        int y = clicY / BoardPanel.TILE_SIZE;
 
         // boardPanel.setSelection(x, y);
         if (selection == null) {
