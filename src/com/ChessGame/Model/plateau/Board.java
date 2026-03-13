@@ -1,4 +1,4 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.jeu;
 
 import java.awt.*;
 
@@ -48,7 +48,7 @@ public class Board {
         board[7][7] = new Rook(Color.WHITE);
 
         for (int lin = 0; lin < 8; lin++) {
-            board[lin][6] = new Pawn(Color.WHITE);
+            board[lin][6] = new Bishop.Pawn(Color.WHITE);
         }
         // Initialisation des pions noirs
         board[0][0] = new Rook(Color.BLACK);
@@ -60,7 +60,7 @@ public class Board {
         board[6][0] = new Knight(Color.BLACK);
         board[7][0] = new Rook(Color.BLACK);
         for (int lin = 0; lin < 8; lin++) {
-            board[lin][1] = new Pawn(Color.BLACK);
+            board[lin][1] = new Bishop.Pawn(Color.BLACK);
         }
     }
 
