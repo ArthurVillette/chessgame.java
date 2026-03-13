@@ -64,8 +64,13 @@ public class Board {
         }
     }
 
-    public Coup getDernierCoup() { return dernierCoup; }
-    public void setDernierCoup(Coup coup) { this.dernierCoup = coup; }
+    public Coup getDernierCoup() {
+        return dernierCoup;
+    }
+
+    public void setDernierCoup(Coup coup) {
+        this.dernierCoup = coup;
+    }
 
     /**
      * Récupère la pièce à une position donnée sur le plateau

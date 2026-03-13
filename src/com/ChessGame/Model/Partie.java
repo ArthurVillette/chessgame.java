@@ -23,6 +23,7 @@ public class Partie extends Observable {
     private boolean humainEstBlanc;
     private List<String> historiqueCoups = new ArrayList<>();
     private boolean fichiersGeneres = false;
+    private List<String> historiquePGN = new ArrayList<>();
 
     /**
      * Constructeur de la classe Partie
@@ -103,6 +104,14 @@ public class Partie extends Observable {
         if (piece == null)
             return;
 
+        char colDep = (char) ('a' + coup.depart.x);
+        int ligDep = 8 - coup.depart.y;
+        char colArr = (char) ('a' + coup.arrivee.x);
+        int ligArr = 8 - coup.arrivee.y;
+        historiqueCoups.add("" + colDep + ligDep + colArr + ligArr);
+
+        historiquePGN.add(genererNotationPGN(coup));
+
         // --- PRISE EN PASSANT ---
         if (piece instanceof Pawn) {
             boolean captureEnDiagonale = (coup.arrivee.x != coup.depart.x);
@@ -140,19 +149,27 @@ public class Partie extends Observable {
         board.setPiece(coup.depart.x, coup.depart.y, null);
         board.setDernierCoup(coup);
 
-        char colDep = (char) ('a' + coup.depart.x);
-        int ligDep = 8 - coup.depart.y;
-        char colArr = (char) ('a' + coup.arrivee.x);
-        int ligArr = 8 - coup.arrivee.y;
-
-        String coupTexte = "" + colDep + ligDep + colArr + ligArr;
-        historiqueCoups.add(coupTexte);
-
         // --- PROMOTION ---
         if (piece instanceof Pawn) {
             int lignePromotion = piece.getColor().equals(Color.WHITE) ? 0 : 7;
             if (coup.arrivee.y == lignePromotion) {
+
                 demanderPromotion(coup.arrivee.x, coup.arrivee.y, piece.getColor());
+
+                String lettrePromo = "q";
+                if (choixPromotion instanceof Rook)
+                    lettrePromo = "r";
+                else if (choixPromotion instanceof Bishop)
+                    lettrePromo = "b";
+                else if (choixPromotion instanceof Knight)
+                    lettrePromo = "n";
+
+                int indexCoups = historiqueCoups.size() - 1;
+                historiqueCoups.set(indexCoups, historiqueCoups.get(indexCoups) + lettrePromo);
+
+                int indexPGN = historiquePGN.size() - 1;
+                historiquePGN.set(indexPGN, historiquePGN.get(indexPGN) + "=" + lettrePromo.toUpperCase());
+
                 return;
             }
         }
@@ -421,8 +438,7 @@ public class Partie extends Observable {
     /**
      * Génère la fiche lisible (.txt) et le fichier d'importation web (.pgn)
      * pour la partie terminée, en utilisant l'historique des coups joués.
-     * 
-     * @param resultat Le résultat final de la partie ("1-0", "0-1", "1/2-1/2")
+     * * @param resultat Le résultat final de la partie ("1-0", "0-1", "1/2-1/2")
      */
     private void genererFichiersFinDePartie(String resultat) {
         if (fichiersGeneres)
@@ -433,11 +449,14 @@ public class Partie extends Observable {
             String numeroPartie = String.format("%04d", new java.io.File("./historique/").listFiles().length + 1);
             java.io.FileWriter txtWriter = new java.io.FileWriter("./historique/fiche_coups_" + numeroPartie + ".txt");
             txtWriter.write("=== HISTORIQUE DE LA PARTIE ===\n\n");
-            for (int i = 0; i < historiqueCoups.size(); i++) {
+
+            // MODIFICATION 1 : On utilise historiquePGN pour que le .txt soit lisible par
+            // un humain
+            for (int i = 0; i < historiquePGN.size(); i++) {
                 if (i % 2 == 0) {
-                    txtWriter.write(((i / 2) + 1) + ". Blanc : " + historiqueCoups.get(i) + " \t");
+                    txtWriter.write(((i / 2) + 1) + ". Blanc : " + historiquePGN.get(i) + " \t");
                 } else {
-                    txtWriter.write("Noir : " + historiqueCoups.get(i) + "\n");
+                    txtWriter.write("Noir : " + historiquePGN.get(i) + "\n");
                 }
             }
             txtWriter.write("\nRésultat final : " + resultat);
@@ -460,11 +479,12 @@ public class Partie extends Observable {
             pgnWriter.write("[Black \"" + nomNoir + "\"]\n");
             pgnWriter.write("[Result \"" + resultat + "\"]\n\n");
 
-            // Écriture des coups à la suite
-            for (int i = 0; i < historiqueCoups.size(); i++) {
+            // MODIFICATION 2 : On utilise historiquePGN pour que Chess.com puisse lire le
+            // fichier
+            for (int i = 0; i < historiquePGN.size(); i++) {
                 if (i % 2 == 0)
                     pgnWriter.write(((i / 2) + 1) + ". ");
-                pgnWriter.write(historiqueCoups.get(i) + " ");
+                pgnWriter.write(historiquePGN.get(i) + " ");
             }
             pgnWriter.write(resultat);
             pgnWriter.close();
@@ -472,9 +492,112 @@ public class Partie extends Observable {
             System.out.println(
                     "✅ Fichiers générés avec succès : 'fiche_coups_" + numeroPartie + ".txt' et 'partie_export_"
                             + numeroPartie + ".pgn'");
+            String cheminStockfish = Config.get("CHEMIN_STOCKFISH", "stockfish");
+            AnalyseurPartie analyseur = new AnalyseurPartie(historiqueCoups, cheminStockfish);
+            new Thread(analyseur).start();
 
         } catch (Exception e) {
             System.err.println("Erreur lors de la sauvegarde : " + e.getMessage());
         }
+    }
+
+    /**
+     * Génère la vraie notation PGN internationale pour les sites d'échecs
+     * 
+     * @param coup Le coup à convertir en notation PGN
+     * @return La notation PGN du coup
+     */
+    private String genererNotationPGN(Coup coup) {
+        Piece piece = board.getPiece(coup.depart.x, coup.depart.y);
+        Piece cible = board.getPiece(coup.arrivee.x, coup.arrivee.y);
+
+        char rawSymbol = piece.getSymbol();
+        boolean estUnPion = Character.toLowerCase(rawSymbol) == 'p';
+        String symbol = estUnPion ? "" : String.valueOf(Character.toUpperCase(rawSymbol));
+
+        // 1. Gestion du Roque
+        if (Character.toLowerCase(rawSymbol) == 'k') {
+            if (coup.arrivee.x - coup.depart.x == 2)
+                return "O-O";
+            if (coup.arrivee.x - coup.depart.x == -2)
+                return "O-O-O";
+        }
+
+        // 2. GESTION DE L'AMBIGUÏTÉ (Deux pièces identiques ciblent la même case)
+        String desambiguation = "";
+        if (!estUnPion && Character.toLowerCase(rawSymbol) != 'k') {
+            boolean autrePeutVenir = false;
+            boolean memeColonne = false;
+            boolean memeLigne = false;
+
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    if (x == coup.depart.x && y == coup.depart.y)
+                        continue;
+
+                    Piece autre = board.getPiece(x, y);
+                    // Si c'est la même pièce (ex: un autre Cavalier Blanc)
+                    if (autre != null && autre.getSymbol() == rawSymbol && autre.getColor().equals(piece.getColor())) {
+                        // S'il peut aussi aller sur la case d'arrivée
+                        if (autre.mouvementsValides(new java.awt.Point(x, y), board).contains(coup.arrivee)) {
+                            autrePeutVenir = true;
+                            if (x == coup.depart.x)
+                                memeColonne = true;
+                            if (y == coup.depart.y)
+                                memeLigne = true;
+                        }
+                    }
+                }
+            }
+
+            if (autrePeutVenir) {
+                if (!memeColonne) {
+                    desambiguation += (char) ('a' + coup.depart.x); // ex: Nfe5
+                } else if (!memeLigne) {
+                    desambiguation += (8 - coup.depart.y); // ex: N3e5
+                } else {
+                    desambiguation += (char) ('a' + coup.depart.x) + "" + (8 - coup.depart.y);
+                }
+            }
+        }
+
+        boolean isCapture = (cible != null);
+
+        // 3. Gestion de la Prise en passant
+        if (estUnPion && coup.depart.x != coup.arrivee.x && cible == null) {
+            isCapture = true;
+        }
+
+        char colDepart = (char) ('a' + coup.depart.x);
+        char colArrivee = (char) ('a' + coup.arrivee.x);
+        int ligneArrivee = 8 - coup.arrivee.y;
+
+        String notation = symbol + desambiguation;
+
+        if (isCapture) {
+            if (estUnPion)
+                notation += colDepart; // ex: "e" pour "exd5"
+            notation += "x";
+        }
+        notation += "" + colArrivee + ligneArrivee;
+
+        // 5. GESTION DES ÉCHECS ET DES MATS (+ et #)
+        // On simule le coup à l'avance pour voir si le roi adverse tremble
+        board.setPiece(coup.arrivee.x, coup.arrivee.y, piece);
+        board.setPiece(coup.depart.x, coup.depart.y, null);
+
+        Joueur adversaire = piece.getColor().equals(java.awt.Color.WHITE) ? jNoir : jBlanc;
+
+        if (roiEnEchecEtMat(adversaire)) {
+            notation += "#";
+        } else if (roiEnEchec(adversaire)) {
+            notation += "+";
+        }
+
+        // On annule la simulation et on remet les pièces à leur place
+        board.setPiece(coup.depart.x, coup.depart.y, piece);
+        board.setPiece(coup.arrivee.x, coup.arrivee.y, cible);
+
+        return notation;
     }
 }
