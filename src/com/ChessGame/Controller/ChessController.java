@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import com.ChessGame.Model.Board;
-import com.ChessGame.Model.Coup;
-import com.ChessGame.Model.Partie;
-import com.ChessGame.Model.Piece;
+import com.ChessGame.Model.plateau.Board;
+import com.ChessGame.Model.jeu.Coup;
+import com.ChessGame.Model.jeu.Partie;
+import com.ChessGame.Model.ChessPieces.Piece;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.BoardPanel;
 
@@ -83,6 +83,15 @@ public class ChessController extends MouseAdapter {
                 selection = null;
                 boardPanel.setSelection(-1, -1);
                 boardPanel.setCasesPossibles(new ArrayList<>());
+                return;
+            }
+            // Re-selection directe si on clique sur une autre piece de sa couleur
+            Piece autrePiece = model.getPiece(x, y);
+            if (autrePiece != null && autrePiece.getColor() == partie.getJoueurCourant().getCouleur()) {
+                selection = new Point(x, y);
+                boardPanel.setSelection(x, y);
+                List<Point> moves = autrePiece.getMouvementsLegaux(selection, model, partie);
+                boardPanel.setCasesPossibles(moves);
                 return;
             }
             Coup coup = new Coup(selection, new Point(x, y));

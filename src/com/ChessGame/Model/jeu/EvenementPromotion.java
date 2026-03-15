@@ -1,10 +1,10 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.jeu;
 
 import java.awt.Color;
 
 /**
  * Objet transporté dans notifyObservers() quand une promotion est détectée.
- * La Vue l'intercepte pour afficher la popup.
+ * La Vue l'intercepte pour afficher la popup de proposition de piece.
  */
 public class EvenementPromotion {
     public final int x;

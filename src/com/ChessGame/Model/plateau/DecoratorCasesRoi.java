@@ -1,7 +1,9 @@
 package com.ChessGame.Model.plateau;
 
-import com.ChessGame.Model.King;
-import com.ChessGame.Model.Rook;
+import com.ChessGame.Model.ChessPieces.King;
+import com.ChessGame.Model.ChessPieces.Rook;
+import com.ChessGame.Model.ChessPieces.Piece;
+
 import java.util.ArrayList;
 
 /**
@@ -30,7 +32,7 @@ public class DecoratorCasesRoi extends DecoratorCasesAccessibles {
             int y = position.y;
 
             // Petit roque (côté roi, droite)
-            com.ChessGame.Model.Piece tourDroite = plateau.getPiece(7, y);
+            Piece tourDroite = plateau.getPiece(7, y);
             if (tourDroite instanceof Rook && !((Rook) tourDroite).aBouge()
                     && plateau.getPiece(5, y) == null
                     && plateau.getPiece(6, y) == null) {
@@ -38,7 +40,7 @@ public class DecoratorCasesRoi extends DecoratorCasesAccessibles {
             }
 
             // Grand roque (côté dame, gauche)
-            com.ChessGame.Model.Piece tourGauche = plateau.getPiece(0, y);
+            Piece tourGauche = plateau.getPiece(0, y);
             if (tourGauche instanceof Rook && !((Rook) tourGauche).aBouge()
                     && plateau.getPiece(1, y) == null
                     && plateau.getPiece(2, y) == null

@@ -1,7 +1,9 @@
 package com.ChessGame.Model.plateau;
 
-import com.ChessGame.Model.Coup;
-import com.ChessGame.Model.Pawn;
+import com.ChessGame.Model.ChessPieces.Bishop;
+import com.ChessGame.Model.jeu.Coup;
+import com.ChessGame.Model.ChessPieces.Piece;
+
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -42,7 +44,7 @@ public class DecoratorCasesPion extends DecoratorCasesAccessibles {
             int cx = x + dx;
             int cy = y + direction;
             if (cx >= 0 && cx < 8 && cy >= 0 && cy < 8) {
-                com.ChessGame.Model.Piece cible = plateau.getPiece(cx, cy);
+                Piece cible = plateau.getPiece(cx, cy);
                 if (cible != null && !cible.getColor().equals(piece.getColor())) {
                     cases.add(new Case(cx, cy));
                 }
@@ -52,8 +54,8 @@ public class DecoratorCasesPion extends DecoratorCasesAccessibles {
         // Prise en passant
         Coup dernierCoup = plateau.getDernierCoup();
         if (dernierCoup != null) {
-            com.ChessGame.Model.Piece pieceAdverse = plateau.getPiece(dernierCoup.arrivee.x, dernierCoup.arrivee.y);
-            boolean estUnPion        = pieceAdverse instanceof Pawn;
+            Piece pieceAdverse = plateau.getPiece(dernierCoup.arrivee.x, dernierCoup.arrivee.y);
+            boolean estUnPion        = pieceAdverse instanceof Bishop.Pawn;
             boolean aAvanceDeDeux    = Math.abs(dernierCoup.arrivee.y - dernierCoup.depart.y) == 2;
             boolean estSurMaLigne    = dernierCoup.arrivee.y == y;
             boolean estACoté         = Math.abs(dernierCoup.arrivee.x - x) == 1;

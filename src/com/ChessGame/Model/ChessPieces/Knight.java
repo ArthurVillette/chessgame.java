@@ -1,4 +1,4 @@
-package com.ChessGame.Model.jeu;
+package com.ChessGame.Model.ChessPieces;
 
 import com.ChessGame.Model.plateau.*;
 import java.awt.Color;

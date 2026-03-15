@@ -1,4 +1,4 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.jeu;
 
 /**
  * Événement envoyé après chaque mouvement de pièce.

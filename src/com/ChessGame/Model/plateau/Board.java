@@ -1,4 +1,7 @@
-package com.ChessGame.Model.jeu;
+package com.ChessGame.Model.plateau;
+
+import com.ChessGame.Model.ChessPieces.*;
+import com.ChessGame.Model.jeu.Coup;
 
 import java.awt.*;
 

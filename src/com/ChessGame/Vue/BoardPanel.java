@@ -1,10 +1,12 @@
 package com.ChessGame.Vue;
 
 import javax.swing.*;
-import com.ChessGame.Model.Board;
+
+import com.ChessGame.Model.jeu.Partie;
+import com.ChessGame.Model.plateau.Board;
 import java.awt.*;
-import com.ChessGame.Model.EvenementMouvement;
-import com.ChessGame.Model.Piece;
+import com.ChessGame.Model.jeu.EvenementMouvement;
+import com.ChessGame.Model.ChessPieces.Piece;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +18,13 @@ import java.util.List;
  */
 public class BoardPanel extends JPanel implements Observer {
     private Board board;
-    public static final int TILE_SIZE = 80;
-    public static final int MARGE = 30; // Notre espace pour le texte
+    private Partie partie;
 
+    //public static final int TILE_SIZE = 50;
+    public static final int TILE_SIZE = ChessFrame.TILE_SIZE;
+    public static final int MARGE     = Math.max(30, ChessFrame.TILE_SIZE / 4);
+    //public static final int MARGE = 30; // Notre espace pour le texte
+    private boolean estRetourne = false; // true si joueur joue Noir
     private int selectedX = -1;
     private int selectedY = -1;
     private Map<String, Image> imageCache = new HashMap<>();
@@ -35,6 +41,17 @@ public class BoardPanel extends JPanel implements Observer {
         loadAllImages();
     }
 
+    // Coordonnee pixel X selon retournement
+    private int toPixelX(int col) {
+        return MARGE + (estRetourne ? (7 - col) : col) * TILE_SIZE;
+    }
+
+    // Coordonnee pixel Y selon retournement
+    private int toPixelY(int row) {
+        return MARGE + (estRetourne ? (7 - row) : row) * TILE_SIZE;
+    }
+
+
     /**
      * Met à jour la sélection de la case et redessine le plateau
      * 
@@ -46,6 +63,13 @@ public class BoardPanel extends JPanel implements Observer {
         this.selectedY = y;
         this.repaint();
     }
+
+    public void setRetourne(boolean retourne) {
+        this.estRetourne = retourne;
+        repaint();
+    }
+
+    public void setPartie(Partie p) { this.partie = p; }
 
 
     /**
@@ -71,6 +95,7 @@ public class BoardPanel extends JPanel implements Observer {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
         drawGrid(g);
         drawCoordinates(g); // NOUVEAU : Dessin du texte
         drawSelection(g);
@@ -90,14 +115,20 @@ public class BoardPanel extends JPanel implements Observer {
 
         for (int i = 0; i < 8; i++) {
             // Dessin des lettres (a-h) en bas
-            String lettre = String.valueOf((char) ('a' + i));
+            //String lettre = String.valueOf((char) ('a' + i));
+            // APRÈS : inversé si retourné
+            int colLogique = estRetourne ? (7 - i) : i;
+            String lettre = String.valueOf((char) ('a' + colLogique));
+
             int textWidth = fm.stringWidth(lettre);
             int xLettre = MARGE + (i * TILE_SIZE) + (TILE_SIZE - textWidth) / 2;
             int yLettre = MARGE + (8 * TILE_SIZE) + 20; // 20 pixels sous le plateau
             g.drawString(lettre, xLettre, yLettre);
 
             // Dessin des chiffres (8-1) à gauche
-            String chiffre = String.valueOf(8 - i);
+           // String chiffre = String.valueOf(8 - i);
+            int rowLogique = estRetourne ? i : (7 - i);
+            String chiffre = String.valueOf(rowLogique + 1);
             int textHeight = fm.getAscent();
             int xChiffre = 10; // 10 pixels depuis le bord gauche de la fenêtre
             int yChiffre = MARGE + (i * TILE_SIZE) + (TILE_SIZE + textHeight) / 2 - 4;
@@ -119,7 +150,8 @@ public class BoardPanel extends JPanel implements Observer {
                     g.setColor(new Color(119, 148, 85));
 
                 // MODIFICATION : Ajout de la MARGE au X et au Y
-                g.fillRect(MARGE + col * TILE_SIZE, MARGE + row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                //g.fillRect(MARGE + col * TILE_SIZE, MARGE + row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                g.fillRect(toPixelX(col), toPixelY(row), TILE_SIZE, TILE_SIZE);
             }
         }
     }
@@ -131,9 +163,10 @@ public class BoardPanel extends JPanel implements Observer {
      */
     private void drawSelection(Graphics g) {
         if (selectedX != -1 && selectedY != -1) {
-            g.setColor(new Color(255, 0, 0, 150));
+            g.setColor(new Color(246, 246, 105, 180));
             // MODIFICATION : Ajout de la MARGE
-            g.fillRect(MARGE + selectedX * TILE_SIZE, MARGE + selectedY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            //g.fillRect(MARGE + selectedX * TILE_SIZE, MARGE + selectedY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            g.fillRect(toPixelX(selectedX), toPixelY(selectedY), TILE_SIZE, TILE_SIZE);
         }
     }
 
@@ -180,10 +213,22 @@ public class BoardPanel extends JPanel implements Observer {
             for (int col = 0; col < 8; col++) {
                 Piece piece = board.getPiece(col, row);
                 if (piece != null) {
+                    // Surligner le roi en echec en rouge
+                    if (piece.getSymbol() == 'k' || piece.getSymbol() == 'K') {
+                        if (partie != null) {
+                            com.ChessGame.Model.jeu.Joueur joueur = piece.getColor().equals(java.awt.Color.WHITE)
+                                    ? partie.getJoueurBlanc() : partie.getJoueurNoir();
+                            if (joueur != null && partie.roiEnEchec(joueur)) {
+                                g.setColor(new Color(220, 50, 50, 180));
+                                g.fillRect(toPixelX(col), toPixelY(row), TILE_SIZE, TILE_SIZE);
+                            }
+                        }
+                    }
                     Image img = imageCache.get(piece.getImagePath());
                     if (img != null) {
                         // MODIFICATION : Ajout de la MARGE
-                        g.drawImage(img, MARGE + col * TILE_SIZE, MARGE + row * TILE_SIZE, TILE_SIZE, TILE_SIZE, this);
+                        g.drawImage(img, toPixelX(col), toPixelY(row), TILE_SIZE, TILE_SIZE, this);
+                        //g.drawImage(img, MARGE + col * TILE_SIZE, MARGE + row * TILE_SIZE, TILE_SIZE, TILE_SIZE, this);
                     } else {
                         g.setColor(piece.getColor());
                         // MODIFICATION : Ajout de la MARGE
