@@ -3,14 +3,12 @@ package com.ChessGame.Vue;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.*;
 
 /**
  * Popup stylée fin de partie — thème Poisson Bloqué
  */
 public class PopupFinPartie extends JDialog {
 
-    private static final Color FOND        = new Color(22, 36, 22);
     private static final Color FOND_CARTE  = new Color(35, 48, 35);
     private static final Color VERT        = new Color(119, 148, 85);
     private static final Color VERT_HOVER  = new Color(100, 130, 70);
@@ -113,6 +111,7 @@ public class PopupFinPartie extends JDialog {
         root.add(btnPanel,  BorderLayout.SOUTH);
 
         setContentPane(root);
+        this.setMinimumSize(new Dimension(400, 320));
         pack();
         setLocationRelativeTo(parent);
     }
@@ -132,7 +131,7 @@ public class PopupFinPartie extends JDialog {
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-        btn.setPreferredSize(new Dimension(0, 40));
+        btn.setPreferredSize(new Dimension(160, 45));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }

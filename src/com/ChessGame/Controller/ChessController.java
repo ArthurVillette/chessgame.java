@@ -16,30 +16,24 @@ import com.ChessGame.Vue.BoardPanel;
  * Classe représentant le contrôleur du jeu d'échecs
  */
 public class ChessController extends MouseAdapter {
-    private Board model;
-    private ChessFrame view;
-    private BoardPanel boardPanel;
-    private Partie partie;
+    private final Board model;
+    private final ChessFrame view;
+    private final BoardPanel boardPanel;
+    private final Partie partie;
 
     private Point selection = null; // null = aucune pièce sélectionnée
+    private boolean enPause = false;
 
-    /**
-     * Constructeur du contrôleur d'échecs
-     * 
-     * @param model Le modèle du plateau d'échecs
-     * @param view  La vue principale de l'application
-     */
-    public ChessController(Board model, ChessFrame view) {
-        this.model = model;
-        this.view = view;
-        this.boardPanel = view.getBoardPanel();
-    }
 
     public ChessController(Board model, ChessFrame view, Partie partie) {
         this.model = model;
         this.view = view;
         this.boardPanel = view.getBoardPanel();
         this.partie = partie; // ajout
+    }
+
+    public void setEnPause(boolean enPause) {
+        this.enPause = enPause;
     }
 
     /**
@@ -51,6 +45,7 @@ public class ChessController extends MouseAdapter {
      */
     @Override
     public void mousePressed(MouseEvent e) {
+        if (enPause) return;
         int clicX = e.getX() - BoardPanel.MARGE;
         int clicY = e.getY() - BoardPanel.MARGE;
         if (clicX < 0 || clicY < 0 || clicX >= 8 * BoardPanel.TILE_SIZE || clicY >= 8 * BoardPanel.TILE_SIZE) {

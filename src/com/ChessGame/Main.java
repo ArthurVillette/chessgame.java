@@ -65,6 +65,7 @@ public class Main {
         PromotionDialog promotionDialog = new PromotionDialog(partie);
 
         ChessController controller = new ChessController(board, frame, partie);
+        frame.setChessController(controller);
         frame.getBoardPanel().addMouseListener(controller);
 
         // Timer initialisé depuis le choix du menu

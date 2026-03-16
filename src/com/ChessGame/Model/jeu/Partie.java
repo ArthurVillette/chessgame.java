@@ -177,15 +177,12 @@ public class Partie extends Observable {
         setChanged();
         notifyObservers(new EvenementPromotion(x, y, couleur));
 
-        // Bloquer le thread du jeu jusqu'au choix du joueur
         while (choixPromotion == null) {
             try { wait(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         }
 
-        // Placer la pièce choisie sur le plateau
         board.setPiece(x, y, choixPromotion);
 
-        // Notifier le mouvement pour que BoardPanel repeigne avec la nouvelle pièce
         setChanged();
         notifyObservers(new EvenementMouvement());
     }

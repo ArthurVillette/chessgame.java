@@ -16,11 +16,8 @@ public class PlayerInfoPanel extends JPanel {
     private static final Color FOND        = new Color(38, 52, 38);
     private static final Color FOND_TIMER  = new Color(22, 36, 22);
     private static final Color BEIGE       = new Color(235, 235, 208);
-    private static final Color GRIS_CLAIR  = new Color(160, 170, 150);
-    private static final Color VERT_VIF    = new Color(119, 148, 85);
     private static final Color OR          = new Color(212, 175, 55);
     private static final Color BLANC_PIECE = new Color(230, 230, 210);
-    private static final Color NOIR_PIECE  = new Color(60, 60, 60);
 
     private final boolean estBlanc;
     private String nomJoueur;
@@ -28,10 +25,15 @@ public class PlayerInfoPanel extends JPanel {
     private int secondesRestantes = -1; // -1 = pas de timer
 
     // Sous-composants
-    private JLabel labelNom;
-    private JLabel labelTimer;
-    private JPanel piecesPanel;
+    private final JLabel labelNom;
+    private final JLabel labelTimer;
+    private final JPanel piecesPanel;
 
+    /**
+     * Constructeur du panneau d'information d'un joueur
+     * @param estBlanc true si joueur blanc, false si joueur noir (détermine couleur pion + pièces capturées affichées)
+     * @param nomJoueur nom du joueur à afficher
+     */
     public PlayerInfoPanel(boolean estBlanc, String nomJoueur) {
         this.estBlanc = estBlanc;
         this.nomJoueur = nomJoueur;
@@ -51,8 +53,8 @@ public class PlayerInfoPanel extends JPanel {
         pion.setForeground(estBlanc ? BLANC_PIECE : new Color(80, 80, 80));
 
         labelNom = new JLabel(nomJoueur);
-        labelNom.setFont(new Font("Serif", Font.BOLD, 14));
-        labelNom.setForeground(BEIGE);
+        labelNom.setFont(new Font("Serif", Font.BOLD, 16));
+        labelNom.setForeground(OR);
 
         gauchePanel.add(pion);
         gauchePanel.add(labelNom);
@@ -76,7 +78,8 @@ public class PlayerInfoPanel extends JPanel {
         labelTimer.setBackground(FOND_TIMER);
         labelTimer.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(60, 80, 60), 1, true),
-                BorderFactory.createEmptyBorder(3, 10, 3, 10)
+                //BorderFactory.createEmptyBorder(3, 10, 3, 10)
+                BorderFactory.createEmptyBorder(4, 12, 4, 12)
         ));
         labelTimer.setHorizontalAlignment(SwingConstants.CENTER);
         labelTimer.setPreferredSize(new Dimension(90, 30));
@@ -87,18 +90,21 @@ public class PlayerInfoPanel extends JPanel {
         add(labelTimer, BorderLayout.EAST);
     }
 
-    // ── API publique ─────────────────────────────────────────────────
-
+    /**
+     * Ajoute une pièce à la liste des pièces capturées par ce joueur
+     * @param piece la pièce capturée à ajouter (sera affichée au centre du panneau)
+     */
     public void ajouterPiece(Piece piece) {
         piecesCaptured.add(piece);
         piecesPanel.repaint();
     }
 
-    public void setPiecesCaptured(List<Piece> pieces) {
-        this.piecesCaptured = new ArrayList<>(pieces);
-        piecesPanel.repaint();
-    }
 
+
+    /**
+     * Met à jour le timer du joueur avec le nombre de secondes restantes
+     * @param secondes le nombre de secondes restantes pour ce joueur (affiché au format "m:ss", en rouge si <30s)
+     */
     public void setTemps(int secondes) {
         this.secondesRestantes = secondes;
         int min = secondes / 60;
@@ -110,13 +116,12 @@ public class PlayerInfoPanel extends JPanel {
         labelTimer.repaint();
     }
 
-    public void setNom(String nom) {
-        this.nomJoueur = nom;
-        labelNom.setText(nom);
-    }
 
-    // ── Dessin des pièces capturées ──────────────────────────────────
 
+    /**
+     * Dessine les pièces capturées par ce joueur au centre du panneau
+     * @param g2 le contexte graphique pour dessiner les symboles des pièces capturées et leur valeur totale
+     */
     private void dessinerPiecesCaptured(Graphics2D g2) {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
@@ -167,7 +172,7 @@ public class PlayerInfoPanel extends JPanel {
         }
 
         if (totalValeur > 0) {
-            g2.setFont(new Font("SansSerif", Font.BOLD, 11));
+            g2.setFont(new Font("SansSerif", Font.BOLD, 13));
             g2.setColor(OR);
             g2.drawString("+" + totalValeur, x + 4, y - 1);
         }

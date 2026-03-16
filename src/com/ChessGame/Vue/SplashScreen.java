@@ -2,8 +2,7 @@ package com.ChessGame.Vue;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.*;
-import java.awt.event.*;
+
 
 /**
  * Splash screen animé "Poisson Bloqué"
@@ -15,7 +14,7 @@ public class SplashScreen extends JWindow {
     private float alphaLogo = 0f;
     private float alphaSous = 0f;
     private Timer timer;
-    private Runnable onFinish;
+    private final Runnable onFinish;
 
     // Palette inspirée échecs : vert profond + or
     private static final Color FOND         = new Color(22, 36, 22);
@@ -23,7 +22,6 @@ public class SplashScreen extends JWindow {
     private static final Color BEIGE        = new Color(235, 235, 208);
     private static final Color OR           = new Color(212, 175, 55);
     private static final Color BARRE_FOND   = new Color(40, 60, 40);
-    private static final Color BARRE_ACTIVE = new Color(119, 148, 85);
 
     public SplashScreen(Runnable onFinish) {
         this.onFinish = onFinish;

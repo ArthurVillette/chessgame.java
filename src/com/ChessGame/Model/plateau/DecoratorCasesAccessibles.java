@@ -16,7 +16,7 @@ public abstract class DecoratorCasesAccessibles {
     protected Board plateau;
     protected Piece piece;
 
-    private DecoratorCasesAccessibles base;
+    private final DecoratorCasesAccessibles base;
 
     /**
      * Constructeur

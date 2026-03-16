@@ -10,22 +10,20 @@ import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.EvaluationPanel;
 import com.ChessGame.Vue.SettingPanel;
 import com.ChessGame.Vue.PopupFinPartie;
-import javax.swing.JScrollPane;
 
 /**
  * Classe responsable de la boucle de jeu, exécutée dans un thread séparé
  */
 public class JeuController implements Runnable {
 
-    private Partie partie;
-    private BoardPanel boardPanel;
-    private ChessFrame frame;
-    private EvaluationPanel evaluationPanel;
+    private final Partie partie;
+    private final BoardPanel boardPanel;
+    private final ChessFrame frame;
+    private final EvaluationPanel evaluationPanel;
     private int moveCount = 1;
     private boolean estEvaluer = false;
     private boolean anotationEchec = true;
-    private JScrollPane scrollPaneHistorique;
-    private SettingPanel settingPanel;
+
 
 
     // ── Timer ─────────────────────────────────────────────────────
@@ -41,28 +39,8 @@ public class JeuController implements Runnable {
     private final String nomBlanc;
     private final String nomNoir;
 
-    /**
-     * Constructeur du JeuController
-     * 
-     * @param partie          La partie en cours à contrôler
-     * @param boardPanel      Le panneau de jeu à mettre à jour après chaque coup
-     * @param evaluationPanel Le panneau d'évaluation à mettre à jour après chaque
-     *                        coup
-     * @param frame           La fenêtre principale pour afficher les messages de
-     *                        fin de partie
-     */
-    public JeuController(Partie partie, BoardPanel boardPanel, EvaluationPanel evaluationPanel, ChessFrame frame) {
-        this.partie = partie;
-        this.boardPanel = boardPanel;
-        this.evaluationPanel = evaluationPanel;
-        this.frame = frame;
-        this.timerInitial = 0;
-        this.nomBlanc="Joueur";
-        this.nomNoir="Adversaire";
 
 
-
-    }
 
 
     public JeuController(Partie partie, BoardPanel boardPanel,
@@ -104,6 +82,10 @@ public class JeuController implements Runnable {
             this.setAnotationEchec(actif);
             frame.getScrollPaneHistorique().setVisible(actif);
             frame.pack();
+        });
+        frame.setOnJaugeToggle(() -> {
+            boolean actif = frame.getEvaluationPanel().isVisible();
+            this.SetEstEvaluer(actif);
         });
 
         // ── Démarrer le timer si configuré ────────────────────────
@@ -186,7 +168,6 @@ private void togglePause() {
     } else {
         if (tickTimer != null && timerInitial > 0) tickTimer.start();
     }
-    // Débloquer getCoup() si en pause (optionnel — le joueur peut toujours jouer)
 }
 
 private void gererTimeout(boolean blancGagne) {
@@ -256,8 +237,7 @@ private void afficherFinPartie() {
         }
         notation += caseArrivee;
 
-        // Note: Pour ajouter '+' (échec) ou '#' (mat), il faut le vérifier APRÈS avoir
-        // joué le coup.
+
 
         // 5. Mise en page (Tour 1. Blancs Noirs)
         if (piece.getColor().equals(java.awt.Color.WHITE)) {
@@ -288,23 +268,9 @@ private void afficherFinPartie() {
         this.anotationEchec = anotationEchec;
     }
 
-    /**
-     * Permet de savoir si les notations des coups sont affichées ou non
-     * 
-     * @return true si les notations sont affichées, false sinon
-     */
-    public boolean isAnotationEchec() {
-        return anotationEchec;
-    }
 
-    /**
-     * Permet de savoir si l'évaluation de la position est affichée ou non
-     * 
-     * @return true si l'évaluation est affichée, false sinon
-     */
-    public boolean isEstEvaluer() {
-        return estEvaluer;
-    }
+
+
 
     public void setOnNouvellePartie(Runnable r) { this.onNouvellePartie = r; }
 }

@@ -11,7 +11,7 @@ public class EvaluationPanel extends JPanel {
 
     private double pourcentageBlanc = 0.5;
     //RT
-    private String texteScore = "0.0";
+    private final String texteScore = "0.0";
 
     private static final Color FOND_FENETRE = new Color(22, 36, 22);
     private static final Color NOIR_PIECE   = new Color(35, 35, 35);
@@ -24,9 +24,6 @@ public class EvaluationPanel extends JPanel {
      * Définit la taille préférée du panneau pour s'adapter à la hauteur du plateau
      * d'échecs.
      */
-    /*public EvaluationPanel() {
-        setPreferredSize(new Dimension(30, ChessFrame.TILE_SIZE * 8));
-    }*/
 
         public  EvaluationPanel() {
         setPreferredSize(new Dimension(20, ChessFrame.TILE_SIZE * 8 + 2 * BoardPanel.MARGE));
@@ -42,7 +39,6 @@ public class EvaluationPanel extends JPanel {
          * * @param scoreCentipions Le score renvoyé par Stockfish (positif = avantage
          * Blancs)
          */
-    // Dans com.ChessGame.Vue.EvaluationPanel
 
     public void setScore(double scoreCentipions) {
         this.pourcentageBlanc = 1.0 / (1.0 + Math.exp(-0.004 * scoreCentipions));
@@ -59,34 +55,11 @@ public class EvaluationPanel extends JPanel {
         repaint();
     }
 
-    /*@Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
 
-        int width = getWidth();
-        int height = getHeight();
-
-        // Calcul de la hauteur de la zone blanche (les blancs démarrent en bas du
-        // plateau)
-        int hauteurBlanche = (int) (height * pourcentageBlanc);
-        int hauteurNoire = height - hauteurBlanche;
-
-        // 1. Dessiner la partie Noire (en haut)
-        g.setColor(new Color(64, 64, 64)); // Un gris très foncé / noir doux
-        g.fillRect(0, 0, width, hauteurNoire);
-
-        // 2. Dessiner la partie Blanche (en bas)
-        g.setColor(new Color(240, 240, 240)); // Un blanc légèrement cassé pour ne pas éblouir
-        g.fillRect(0, hauteurNoire, width, hauteurBlanche);
-
-        // 3. Ligne de démarcation rouge au centre exact (point d'égalité = 0.0)
-        g.setColor(Color.RED);
-        g.drawLine(0, height / 2, width, height / 2);
-
-        // 4. Petite bordure noire autour de la jauge pour une finition propre
-        g.setColor(Color.BLACK);
-        g.drawRect(0, 0, width - 1, height - 1);
-    }*/
+    /**
+     * Surcharge de la méthode paintComponent pour dessiner la jauge d'avantage.
+     * @param g the <code>Graphics</code> object to protect
+     */
 
     @Override
     protected void paintComponent(Graphics g) {
