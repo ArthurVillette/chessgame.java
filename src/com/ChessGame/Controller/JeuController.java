@@ -217,30 +217,63 @@ private void afficherFinPartie() {
      *               spéciales (ex: échec)
      * @return La notation du coup
      */
+    /**
+     * Génère la notation algébrique standard d'un coup
+     */
     private String genererNotation(Coup coup, Partie partie) {
         Piece piece = partie.getBoard().getPiece(coup.depart.x, coup.depart.y);
         Piece cible = partie.getBoard().getPiece(coup.arrivee.x, coup.arrivee.y);
-        String symbol = piece.getSymbol() == 'p' ? "" : String.valueOf(piece.getSymbol());
-        boolean isCapture = (cible != null);
 
+        char rawSymbol = piece.getSymbol();
+        boolean estUnPion = Character.toLowerCase(rawSymbol) == 'p';
+
+        String symbol = estUnPion ? "" : String.valueOf(Character.toUpperCase(rawSymbol));
+        if (Character.toLowerCase(rawSymbol) == 'k') {
+            int deltaX = coup.arrivee.x - coup.depart.x;
+            if (deltaX == 2) {
+                return formaterSortie("O-O", piece.getColor().equals(java.awt.Color.WHITE));
+            } else if (deltaX == -2) {
+                return formaterSortie("O-O-O", piece.getColor().equals(java.awt.Color.WHITE));
+            }
+        }
+
+        boolean isCapture = (cible != null);
+        if (estUnPion && coup.depart.x != coup.arrivee.x && cible == null) {
+            isCapture = true;
+        }
+
+        char colDepart = (char) ('a' + coup.depart.x);
         char colArrivee = (char) ('a' + coup.arrivee.x);
         int ligneArrivee = 8 - coup.arrivee.y;
         String caseArrivee = "" + colArrivee + ligneArrivee;
 
         String notation = symbol;
+
         if (isCapture) {
-            // Règle spéciale : si un pion capture, on note sa colonne de départ (ex: exd5)
-            if (symbol.equals("")) {
-                notation += (char) ('a' + coup.depart.x);
+            if (estUnPion) {
+                notation += colDepart;
             }
-            notation += "x"; // Symbole de capture
+            notation += "x";
         }
+
         notation += caseArrivee;
 
+<<<<<<< HEAD
+        if (estUnPion && (coup.arrivee.y == 0 || coup.arrivee.y == 7)) {
+            notation += "=Q";
+        }
+=======
 
+>>>>>>> main
 
-        // 5. Mise en page (Tour 1. Blancs Noirs)
-        if (piece.getColor().equals(java.awt.Color.WHITE)) {
+        return formaterSortie(notation, piece.getColor().equals(java.awt.Color.WHITE));
+    }
+
+    /**
+     * Petite méthode utilitaire pour éviter de répéter le code d'affichage
+     */
+    private String formaterSortie(String notation, boolean estBlanc) {
+        if (estBlanc) {
             String affichage = moveCount + ". " + String.format("%-8s", notation);
             moveCount++;
             return affichage;

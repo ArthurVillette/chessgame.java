@@ -18,7 +18,7 @@ print("2. Traduction des données pour l'IA...")
 
 valeurs_pieces = {
     'P': 1, 'N': 3, 'B': 3.5, 'R': 5, 'Q': 9, 'K': 100,
-    'p': -1, 'n': -3, 'b': -3, 'r': -5, 'q': -9, 'k': -100
+    'p': -1, 'n': -3, 'b': -3.5, 'r': -5, 'q': -9, 'k': -100
 }
 
 def fen_vers_vecteur(fen):
