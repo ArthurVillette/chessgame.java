@@ -1,16 +1,21 @@
 package com.ChessGame.Model.jeu;
 
-import com.ChessGame.Model.AnalyseurPartie;
-import com.ChessGame.Model.ChessPieces.*;
+import com.ChessGame.Model.ChessPieces.Bishop;
+import com.ChessGame.Model.ChessPieces.King;
+import com.ChessGame.Model.ChessPieces.Piece;
+import com.ChessGame.Model.ChessPieces.Rook;
+import com.ChessGame.Model.ChessPieces.Queen;
+import com.ChessGame.Model.ChessPieces.Knight;
 import com.ChessGame.Model.IA.Config;
 import com.ChessGame.Model.IA.IAClient;
 import com.ChessGame.Model.IA.JoueurIA;
 import com.ChessGame.Model.plateau.Board;
-
+import com.ChessGame.Model.AnalyseurPartie;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+
 import com.ChessGame.Network.ReseauManager;
 
 /**
@@ -29,7 +34,7 @@ public class Partie extends Observable {
     private IAClient moteurVillette;
     private boolean contreIA;
     private boolean humainEstBlanc;
-    private  List<String>historiqueCoups=new ArrayList<>();
+    private List<String> historiqueCoups = new ArrayList<>();
     private boolean fichiersGeneres = false;
     private List<String> historiquePGN = new ArrayList<>();
     private ReseauManager reseauManager;
@@ -87,8 +92,13 @@ public class Partie extends Observable {
         return joueurCourant;
     }
 
-    public Joueur getJoueurBlanc() { return jBlanc; }
-    public Joueur getJoueurNoir()  { return jNoir; }
+    public Joueur getJoueurBlanc() {
+        return jBlanc;
+    }
+
+    public Joueur getJoueurNoir() {
+        return jNoir;
+    }
 
     /**
      * Permet d'obtenir le plateau de jeu actuel
@@ -452,7 +462,7 @@ public class Partie extends Observable {
      * pour la partie terminée, en utilisant l'historique des coups joués.
      * * @param resultat Le résultat final de la partie ("1-0", "0-1", "1/2-1/2")
      */
-    private void genererFichiersFinDePartie(String resultat) {
+    public void genererFichiersFinDePartie(String resultat) {
         if (fichiersGeneres)
             return;
         fichiersGeneres = true;
