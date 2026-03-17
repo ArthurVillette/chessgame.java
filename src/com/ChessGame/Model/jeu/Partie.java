@@ -1,9 +1,7 @@
 package com.ChessGame.Model.jeu;
 
-import com.ChessGame.Model.ChessPieces.Bishop;
-import com.ChessGame.Model.ChessPieces.King;
-import com.ChessGame.Model.ChessPieces.Piece;
-import com.ChessGame.Model.ChessPieces.Rook;
+import com.ChessGame.Model.AnalyseurPartie;
+import com.ChessGame.Model.ChessPieces.*;
 import com.ChessGame.Model.IA.Config;
 import com.ChessGame.Model.IA.IAClient;
 import com.ChessGame.Model.IA.JoueurIA;
@@ -31,7 +29,7 @@ public class Partie extends Observable {
     private IAClient moteurVillette;
     private boolean contreIA;
     private boolean humainEstBlanc;
-    Private List<String>historiqueCoups=new ArrayList<>();
+    private  List<String>historiqueCoups=new ArrayList<>();
     private boolean fichiersGeneres = false;
     private List<String> historiquePGN = new ArrayList<>();
     private ReseauManager reseauManager;
@@ -88,6 +86,9 @@ public class Partie extends Observable {
     public Joueur getJoueurCourant() {
         return joueurCourant;
     }
+
+    public Joueur getJoueurBlanc() { return jBlanc; }
+    public Joueur getJoueurNoir()  { return jNoir; }
 
     /**
      * Permet d'obtenir le plateau de jeu actuel

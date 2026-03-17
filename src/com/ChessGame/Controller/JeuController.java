@@ -258,13 +258,10 @@ private void afficherFinPartie() {
 
         notation += caseArrivee;
 
-<<<<<<< HEAD
         if (estUnPion && (coup.arrivee.y == 0 || coup.arrivee.y == 7)) {
             notation += "=Q";
         }
-=======
 
->>>>>>> main
 
         return formaterSortie(notation, piece.getColor().equals(java.awt.Color.WHITE));
     }

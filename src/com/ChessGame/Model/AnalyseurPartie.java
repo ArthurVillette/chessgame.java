@@ -1,5 +1,7 @@
 package com.ChessGame.Model;
 
+import com.ChessGame.Model.IA.IAClient;
+
 import java.io.FileWriter;
 import java.util.List;
 
