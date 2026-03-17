@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import com.ChessGame.Model.Board;
-import com.ChessGame.Model.Coup;
-import com.ChessGame.Model.Partie;
-import com.ChessGame.Model.Piece;
+import com.ChessGame.Model.plateau.Board;
+import com.ChessGame.Model.jeu.Coup;
+import com.ChessGame.Model.jeu.Partie;
+import com.ChessGame.Model.ChessPieces.Piece;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.BoardPanel;
 
@@ -16,30 +16,24 @@ import com.ChessGame.Vue.BoardPanel;
  * Classe représentant le contrôleur du jeu d'échecs
  */
 public class ChessController extends MouseAdapter {
-    private Board model;
-    private ChessFrame view;
-    private BoardPanel boardPanel;
-    private Partie partie;
+    private final Board model;
+    private final ChessFrame view;
+    private final BoardPanel boardPanel;
+    private final Partie partie;
 
     private Point selection = null; // null = aucune pièce sélectionnée
+    private boolean enPause = false;
 
-    /**
-     * Constructeur du contrôleur d'échecs
-     * 
-     * @param model Le modèle du plateau d'échecs
-     * @param view  La vue principale de l'application
-     */
-    public ChessController(Board model, ChessFrame view) {
-        this.model = model;
-        this.view = view;
-        this.boardPanel = view.getBoardPanel();
-    }
 
     public ChessController(Board model, ChessFrame view, Partie partie) {
         this.model = model;
         this.view = view;
         this.boardPanel = view.getBoardPanel();
         this.partie = partie; // ajout
+    }
+
+    public void setEnPause(boolean enPause) {
+        this.enPause = enPause;
     }
 
     /**
@@ -51,6 +45,7 @@ public class ChessController extends MouseAdapter {
      */
     @Override
     public void mousePressed(MouseEvent e) {
+        if (enPause) return;
         int clicX = e.getX() - BoardPanel.MARGE;
         int clicY = e.getY() - BoardPanel.MARGE;
         if (clicX < 0 || clicY < 0 || clicX >= 8 * BoardPanel.TILE_SIZE || clicY >= 8 * BoardPanel.TILE_SIZE) {
@@ -83,6 +78,15 @@ public class ChessController extends MouseAdapter {
                 selection = null;
                 boardPanel.setSelection(-1, -1);
                 boardPanel.setCasesPossibles(new ArrayList<>());
+                return;
+            }
+            // Re-selection directe si on clique sur une autre piece de sa couleur
+            Piece autrePiece = model.getPiece(x, y);
+            if (autrePiece != null && autrePiece.getColor() == partie.getJoueurCourant().getCouleur()) {
+                selection = new Point(x, y);
+                boardPanel.setSelection(x, y);
+                List<Point> moves = autrePiece.getMouvementsLegaux(selection, model, partie);
+                boardPanel.setCasesPossibles(moves);
                 return;
             }
             Coup coup = new Coup(selection, new Point(x, y));

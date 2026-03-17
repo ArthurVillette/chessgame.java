@@ -1,4 +1,4 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.jeu;
 
 /**
  * Classe mère abstraite pour tous les événements de la partie.

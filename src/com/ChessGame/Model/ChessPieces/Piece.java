@@ -1,5 +1,8 @@
-package com.ChessGame.Model.jeu;
+package com.ChessGame.Model.ChessPieces;
 
+import com.ChessGame.Model.plateau.Board;
+import com.ChessGame.Model.jeu.Coup;
+import com.ChessGame.Model.jeu.Partie;
 import com.ChessGame.Model.plateau.Case;
 import com.ChessGame.Model.plateau.DecoratorCasesAccessibles;
 

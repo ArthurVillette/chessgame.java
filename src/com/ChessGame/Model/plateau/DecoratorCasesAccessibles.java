@@ -1,6 +1,7 @@
 package com.ChessGame.Model.plateau;
 
-import com.ChessGame.Model.Board;
+import com.ChessGame.Model.ChessPieces.Piece;
+
 import java.util.ArrayList;
 
 /**
@@ -13,9 +14,9 @@ import java.util.ArrayList;
 public abstract class DecoratorCasesAccessibles {
 
     protected Board plateau;
-    protected com.ChessGame.Model.Piece piece;
+    protected Piece piece;
 
-    private DecoratorCasesAccessibles base;
+    private final DecoratorCasesAccessibles base;
 
     /**
      * Constructeur
@@ -29,7 +30,7 @@ public abstract class DecoratorCasesAccessibles {
      * Injecte le plateau et la pièce dans toute la chaîne de décorateurs.
      * Appelé automatiquement par Piece lors de l'initialisation.
      */
-    public void init(Board plateau, com.ChessGame.Model.Piece piece) {
+    public void init(Board plateau, Piece piece) {
         this.plateau = plateau;
         this.piece = piece;
         if (base != null) {
@@ -67,7 +68,7 @@ public abstract class DecoratorCasesAccessibles {
 
         while (x >= 0 && x < 8 && y >= 0 && y < 8) {
             Case c = new Case(x, y);
-            com.ChessGame.Model.Piece occupant = plateau.getPiece(x, y);
+            Piece occupant = plateau.getPiece(x, y);
 
             if (occupant == null) {
                 // Case vide : on peut aller là et continuer
@@ -92,7 +93,7 @@ public abstract class DecoratorCasesAccessibles {
      */
     protected Case caseAccessibleSiLibre(int x, int y) {
         if (x < 0 || x >= 8 || y < 0 || y >= 8) return null;
-        com.ChessGame.Model.Piece occupant = plateau.getPiece(x, y);
+        Piece occupant = plateau.getPiece(x, y);
         if (occupant == null || !occupant.getColor().equals(piece.getColor())) {
             return new Case(x, y);
         }

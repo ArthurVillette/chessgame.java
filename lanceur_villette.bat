@@ -1,3 +1,3 @@
 @echo off
-cd C:\chemin\vers\chessgame.java\model_VILLETTE
-python moteur_villette.py
+cd C:\Users\Utilisateur\IdeaProjects\chessgame.java\model_VILETTE
+python moteur_villette.py 2>nul
