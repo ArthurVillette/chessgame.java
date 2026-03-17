@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import com.ChessGame.Network.ReseauManager;
+
 /**
  * Classe représentant une partie d'échecs, gérant les joueurs, le plateau et
  * les règles du jeu
@@ -24,6 +26,8 @@ public class Partie extends Observable {
     private List<String> historiqueCoups = new ArrayList<>();
     private boolean fichiersGeneres = false;
     private List<String> historiquePGN = new ArrayList<>();
+    private ReseauManager reseauManager;
+    private boolean estEnReseau = false;
 
     /**
      * Constructeur de la classe Partie
