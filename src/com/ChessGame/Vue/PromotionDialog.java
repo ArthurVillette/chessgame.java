@@ -1,6 +1,8 @@
 package com.ChessGame.Vue;
 
-import com.ChessGame.Model.*;
+import com.ChessGame.Model.ChessPieces.*;
+import com.ChessGame.Model.jeu.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Observable;

@@ -1,4 +1,13 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.jeu;
+
+import com.ChessGame.Model.ChessPieces.Bishop;
+import com.ChessGame.Model.ChessPieces.King;
+import com.ChessGame.Model.ChessPieces.Piece;
+import com.ChessGame.Model.ChessPieces.Rook;
+import com.ChessGame.Model.IA.Config;
+import com.ChessGame.Model.IA.IAClient;
+import com.ChessGame.Model.IA.JoueurIA;
+import com.ChessGame.Model.plateau.Board;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -22,7 +31,7 @@ public class Partie extends Observable {
     private IAClient moteurVillette;
     private boolean contreIA;
     private boolean humainEstBlanc;
-    private List<String> historiqueCoups = new ArrayList<>();
+    Private List<String>historiqueCoups=new ArrayList<>();
     private boolean fichiersGeneres = false;
     private List<String> historiquePGN = new ArrayList<>();
     private ReseauManager reseauManager;
@@ -97,11 +106,10 @@ public class Partie extends Observable {
     }
 
     /**
-     * Applique un coup sur le plateau de jeu, en gérant les règles spéciales
-     * (prise en passant, roque, promotion) et en notifiant les observateurs
+     * Applique un coup sur le plateau de jeu
      * 
-     * @param coup Le coup à appliquer sur le plateau
-     **/
+     * @param coup Le coup à appliquer
+     */
     public void appliquerCoup(Coup coup) {
         Piece piece = board.getPiece(coup.depart.x, coup.depart.y);
         if (piece == null)
@@ -119,7 +127,7 @@ public class Partie extends Observable {
         }
 
         // --- PRISE EN PASSANT ---
-        if (piece instanceof Pawn) {
+        if (piece instanceof Bishop.Pawn) {
             boolean captureEnDiagonale = (coup.arrivee.x != coup.depart.x);
             boolean caseArriveeVide = (board.getPiece(coup.arrivee.x, coup.arrivee.y) == null);
             if (captureEnDiagonale && caseArriveeVide) {
@@ -156,7 +164,7 @@ public class Partie extends Observable {
         board.setDernierCoup(coup);
 
         // --- PROMOTION ---
-        if (piece instanceof Pawn) {
+        if (piece instanceof Bishop.Pawn) {
             int lignePromotion = piece.getColor().equals(Color.WHITE) ? 0 : 7;
             if (coup.arrivee.y == lignePromotion) {
 
@@ -196,7 +204,6 @@ public class Partie extends Observable {
         setChanged();
         notifyObservers(new EvenementPromotion(x, y, couleur));
 
-        // Bloquer le thread du jeu jusqu'au choix du joueur
         while (choixPromotion == null) {
             try {
                 wait();
@@ -205,10 +212,8 @@ public class Partie extends Observable {
             }
         }
 
-        // Placer la pièce choisie sur le plateau
         board.setPiece(x, y, choixPromotion);
 
-        // Notifier le mouvement pour que BoardPanel repeigne avec la nouvelle pièce
         setChanged();
         notifyObservers(new EvenementMouvement());
     }

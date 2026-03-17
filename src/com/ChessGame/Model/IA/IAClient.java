@@ -1,4 +1,4 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.IA;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -21,6 +21,7 @@ public class IAClient {
      * @param chemin Le chemin vers le fichier exécutable
      * @return true si le démarrage a réussi, false sinon
      */
+
     public boolean demarrerMoteur(String chemin) {
         try {
             processus = new ProcessBuilder(chemin).start();
@@ -32,6 +33,9 @@ public class IAClient {
             return false;
         }
     }
+
+
+
 
     /**
      * Envoie une commande texte au moteur (Protocole UCI)

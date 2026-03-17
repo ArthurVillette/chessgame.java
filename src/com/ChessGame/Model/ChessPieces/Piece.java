@@ -1,12 +1,14 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.ChessPieces;
 
+import com.ChessGame.Model.plateau.Board;
+import com.ChessGame.Model.jeu.Coup;
+import com.ChessGame.Model.jeu.Partie;
 import com.ChessGame.Model.plateau.Case;
 import com.ChessGame.Model.plateau.DecoratorCasesAccessibles;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Classe abstraite représentant une pièce d'échecs

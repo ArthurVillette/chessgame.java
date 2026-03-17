@@ -1,4 +1,4 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.IA;
 
 import java.io.FileInputStream;
 import java.io.IOException;

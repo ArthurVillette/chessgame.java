@@ -5,17 +5,16 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
-import com.ChessGame.Controller.JeuController;
 
 /**
  * Classe représentant la barre de paramètres du jeu d'échecs
  */
 public class SettingPanel extends JMenuBar {
-    private EvaluationPanel evaluationPanel;
-    private JScrollPane scrollPaneHistorique;
-    private JFrame parentFrame;
-    private JCheckBoxMenuItem itemJauge;
-    private JCheckBoxMenuItem itemNotation;
+    private final EvaluationPanel evaluationPanel;
+    private final JScrollPane scrollPaneHistorique;
+    private final JFrame parentFrame;
+    private final JCheckBoxMenuItem itemJauge;
+    private final JCheckBoxMenuItem itemNotation;
 
     /**
      * Constructeur de la barre de paramètres du jeu d'échecs

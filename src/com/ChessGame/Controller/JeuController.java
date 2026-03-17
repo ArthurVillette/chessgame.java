@@ -1,45 +1,61 @@
 package com.ChessGame.Controller;
 
-import com.ChessGame.Model.*;
+import com.ChessGame.Model.jeu.Coup;
+import com.ChessGame.Model.jeu.Joueur;
+import com.ChessGame.Model.jeu.Partie;
+import com.ChessGame.Model.ChessPieces.Piece;
 import com.ChessGame.Vue.BoardPanel;
 import javax.swing.SwingUtilities;
 import com.ChessGame.Vue.ChessFrame;
 import com.ChessGame.Vue.EvaluationPanel;
 import com.ChessGame.Vue.SettingPanel;
-import javax.swing.JScrollPane;
+import com.ChessGame.Vue.PopupFinPartie;
 
 /**
  * Classe responsable de la boucle de jeu, exécutée dans un thread séparé
  */
 public class JeuController implements Runnable {
 
-    private Partie partie;
-    private BoardPanel boardPanel;
-    private ChessFrame frame;
-    private EvaluationPanel evaluationPanel;
+    private final Partie partie;
+    private final BoardPanel boardPanel;
+    private final ChessFrame frame;
+    private final EvaluationPanel evaluationPanel;
     private int moveCount = 1;
     private boolean estEvaluer = false;
     private boolean anotationEchec = true;
-    private JScrollPane scrollPaneHistorique;
-    private SettingPanel settingPanel;
 
-    /**
-     * Constructeur du JeuController
-     * 
-     * @param partie          La partie en cours à contrôler
-     * @param boardPanel      Le panneau de jeu à mettre à jour après chaque coup
-     * @param evaluationPanel Le panneau d'évaluation à mettre à jour après chaque
-     *                        coup
-     * @param frame           La fenêtre principale pour afficher les messages de
-     *                        fin de partie
-     */
-    public JeuController(Partie partie, BoardPanel boardPanel, EvaluationPanel evaluationPanel, ChessFrame frame) {
-        this.partie = partie;
-        this.boardPanel = boardPanel;
+
+
+    // ── Timer ─────────────────────────────────────────────────────
+    private final int timerInitial;   // secondes (0 = illimité)
+    private int  tempsRestantBlanc;
+    private int  tempsRestantNoir;
+    private javax.swing.Timer tickTimer;
+    private boolean enPause = false;
+    private volatile boolean partieTerminee = false;
+    private Runnable onNouvellePartie;
+
+    // Noms des joueurs (pour popups)
+    private final String nomBlanc;
+    private final String nomNoir;
+
+
+
+
+
+    public JeuController(Partie partie, BoardPanel boardPanel,
+                         EvaluationPanel evaluationPanel, ChessFrame frame,
+                         String nomBlanc, String nomNoir, int timerMinutes) {
+        this.partie        = partie;
+        this.boardPanel    = boardPanel;
         this.evaluationPanel = evaluationPanel;
-        this.frame = frame;
+        this.frame         = frame;
+        this.nomBlanc      = nomBlanc;
+        this.nomNoir       = nomNoir;
+        this.timerInitial  = timerMinutes * 60;
+        this.tempsRestantBlanc = this.timerInitial;
+        this.tempsRestantNoir  = this.timerInitial;
     }
-
     /**
      * La boucle de jeu principale, qui attend les coups des joueurs et met à jour
      * la partie
@@ -47,6 +63,11 @@ public class JeuController implements Runnable {
      */
     @Override
     public void run() {
+
+        // ── Connecter les callbacks Vue → Contrôleur ──────────────
+        frame.setOnForfait(this::gererForfait);
+        frame.setOnPause(this::togglePause);
+
         SettingPanel menu = frame.getSettingPanel();
 
         menu.getItemJauge().addActionListener(e -> {
@@ -62,11 +83,26 @@ public class JeuController implements Runnable {
             frame.getScrollPaneHistorique().setVisible(actif);
             frame.pack();
         });
+        frame.setOnJaugeToggle(() -> {
+            boolean actif = frame.getEvaluationPanel().isVisible();
+            this.SetEstEvaluer(actif);
+        });
 
-        while (!partie.estTerminee()) {
+        // ── Démarrer le timer si configuré ────────────────────────
+        if (timerInitial > 0) demarrerTick();
+
+        while (!partieTerminee && !partie.estTerminee()) {
             Joueur joueurCourant = partie.getJoueurCourant();
             try {
                 Coup coup = joueurCourant.getCoup();
+                if (partieTerminee) break;
+
+                // Arrêter le tick pendant qu'on traite
+                if (tickTimer != null) SwingUtilities.invokeLater(() -> tickTimer.stop());
+                //
+                Piece pieceCaptured  = partie.getBoard().getPiece(coup.arrivee.x, coup.arrivee.y);
+                boolean parLesBlancs = joueurCourant.isWhite();
+
                 if (this.anotationEchec) {
                     String notationCoup = genererNotation(coup, partie);
                     SwingUtilities.invokeLater(() -> frame.ajouterCoup(notationCoup));
@@ -75,32 +111,104 @@ public class JeuController implements Runnable {
                 partie.appliquerCoup(coup);
                 partie.passerTour();
                 SwingUtilities.invokeLater(() -> frame.getBoardPanel().repaint());
+
+                //. Afficher la pièce capturée dans le bon PlayerInfoPanel ─
+                if (pieceCaptured != null) {
+                    SwingUtilities.invokeLater(() ->
+                            frame.ajouterPieceCaptured(pieceCaptured, parLesBlancs));
+                }
+
+
                 if (this.estEvaluer) {
                     new Thread(() -> {
                         double scoreAvantage = partie.evaluerPositionAvecStockfish();
                         SwingUtilities.invokeLater(() -> frame.mettreAJourJauge(scoreAvantage));
                     }).start();
                 }
+                // Reprendre le tick pour le prochain joueur
+                if (timerInitial > 0 && !enPause)
+                    SwingUtilities.invokeLater(() -> tickTimer.start());
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
             }
         }
-        SwingUtilities.invokeLater(() -> {
-            String message;
-            if (partie.roiEnEchec(partie.getJoueurCourant())) {
-                message = "Échec et mat ! " + (partie.getJoueurCourant().isWhite() ? "Les Noirs" : "Les Blancs")
-                        + " ont gagné.";
-            } else {
-                message = "Match nul (Pat) !";
-            }
 
-            javax.swing.JOptionPane.showMessageDialog(boardPanel, message, "Fin de partie",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        });
+        if (!partieTerminee) afficherFinPartie();
+
+
+
 
     }
 
+// ── Timer tick (1 seconde) ────────────────────────────────────
+
+private void demarrerTick() {
+    tickTimer = new javax.swing.Timer(1000, e -> {
+        if (enPause || partieTerminee) return;
+        boolean tourBlanc = partie.getJoueurCourant().isWhite();
+        if (tourBlanc) {
+            tempsRestantBlanc--;
+            frame.setTempsJoueur(true, tempsRestantBlanc);
+            if (tempsRestantBlanc <= 0) gererTimeout(false); // Noir gagne
+        } else {
+            tempsRestantNoir--;
+            frame.setTempsJoueur(false, tempsRestantNoir);
+            if (tempsRestantNoir <= 0) gererTimeout(true); // Blanc gagne
+        }
+    });
+    tickTimer.start();
+}
+
+private void togglePause() {
+    enPause = !enPause;
+    if (enPause) {
+        if (tickTimer != null) tickTimer.stop();
+    } else {
+        if (tickTimer != null && timerInitial > 0) tickTimer.start();
+    }
+}
+
+private void gererTimeout(boolean blancGagne) {
+    partieTerminee = true;
+    if (tickTimer != null) tickTimer.stop();
+    // Débloquer le thread bloqué sur getCoup()
+    partie.getJoueurCourant().setCoup(new com.ChessGame.Model.jeu.Coup(
+            new java.awt.Point(0,0), new java.awt.Point(0,0)));
+    String gagnant = blancGagne ? nomBlanc : nomNoir;
+    //PopupFinPartie.afficher(frame, gagnant, PopupFinPartie.TypeFin.TIMEOUT, null);
+    PopupFinPartie.afficher(frame, gagnant, PopupFinPartie.TypeFin.TIMEOUT, onNouvellePartie);
+}
+
+private void gererForfait() {
+    partieTerminee = true;
+    if (tickTimer != null) tickTimer.stop();
+    boolean estBlanc = partie.getJoueurCourant().isWhite();
+    String gagnant = estBlanc ? nomNoir : nomBlanc; // l'adversaire gagne
+    // Débloquer le thread bloqué sur getCoup()
+    partie.getJoueurCourant().setCoup(new com.ChessGame.Model.jeu.Coup(
+            new java.awt.Point(0,0), new java.awt.Point(0,0)));
+    //PopupFinPartie.afficher(frame, gagnant, PopupFinPartie.TypeFin.FORFAIT, null);
+    PopupFinPartie.afficher(frame, gagnant, PopupFinPartie.TypeFin.FORFAIT, onNouvellePartie);
+}
+
+private void afficherFinPartie() {
+    if (tickTimer != null) tickTimer.stop();
+    SwingUtilities.invokeLater(() -> {
+        String gagnant;
+        PopupFinPartie.TypeFin type;
+        if (partie.roiEnEchec(partie.getJoueurCourant())) {
+            type    = PopupFinPartie.TypeFin.ECHEC_MAT;
+            gagnant = partie.getJoueurCourant().isWhite() ? nomNoir : nomBlanc;
+        } else {
+            type    = PopupFinPartie.TypeFin.PAT;
+            gagnant = null;
+        }
+        PopupFinPartie p = new PopupFinPartie(frame, gagnant, type, onNouvellePartie);
+        p.setVisible(true);
+    });
+}
     /**
      * Génère la notation d'un coup pour l'afficher dans l'historique
      * 
@@ -150,9 +258,13 @@ public class JeuController implements Runnable {
 
         notation += caseArrivee;
 
+<<<<<<< HEAD
         if (estUnPion && (coup.arrivee.y == 0 || coup.arrivee.y == 7)) {
             notation += "=Q";
         }
+=======
+
+>>>>>>> main
 
         return formaterSortie(notation, piece.getColor().equals(java.awt.Color.WHITE));
     }
@@ -189,21 +301,9 @@ public class JeuController implements Runnable {
         this.anotationEchec = anotationEchec;
     }
 
-    /**
-     * Permet de savoir si les notations des coups sont affichées ou non
-     * 
-     * @return true si les notations sont affichées, false sinon
-     */
-    public boolean isAnotationEchec() {
-        return anotationEchec;
-    }
 
-    /**
-     * Permet de savoir si l'évaluation de la position est affichée ou non
-     * 
-     * @return true si l'évaluation est affichée, false sinon
-     */
-    public boolean isEstEvaluer() {
-        return estEvaluer;
-    }
+
+
+
+    public void setOnNouvellePartie(Runnable r) { this.onNouvellePartie = r; }
 }

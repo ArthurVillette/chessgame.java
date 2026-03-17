@@ -1,4 +1,8 @@
-package com.ChessGame.Model;
+package com.ChessGame.Model.IA;
+
+import com.ChessGame.Model.jeu.Coup;
+import com.ChessGame.Model.jeu.Joueur;
+import com.ChessGame.Model.jeu.Partie;
 
 import java.awt.Point;
 
