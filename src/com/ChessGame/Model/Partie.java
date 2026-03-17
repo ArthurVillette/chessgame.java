@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
-
 import com.ChessGame.Network.ReseauManager;
 
 /**
@@ -115,6 +114,9 @@ public class Partie extends Observable {
         historiqueCoups.add("" + colDep + ligDep + colArr + ligArr);
 
         historiquePGN.add(genererNotationPGN(coup));
+        if (estEnReseau && joueurCourant instanceof Joueur) {
+            reseauManager.envoyerCoup(historiqueCoups.get(historiqueCoups.size() - 1));
+        }
 
         // --- PRISE EN PASSANT ---
         if (piece instanceof Pawn) {
@@ -603,5 +605,54 @@ public class Partie extends Observable {
         board.setPiece(coup.arrivee.x, coup.arrivee.y, cible);
 
         return notation;
+    }
+
+    /**
+     * PC 1 : Héberge la partie et attend la connexion du PC 2
+     * 
+     * @param reseauManager Le gestionnaire de réseau pour communiquer avec l'autre
+     *                      joueur
+     */
+    public void recevoirCoupReseau(String coupTexte) {
+        // coupTexte ressemble à "e2e4" ou "e7e8q"
+        int depX = coupTexte.charAt(0) - 'a';
+        int depY = 8 - Character.getNumericValue(coupTexte.charAt(1));
+        int arrX = coupTexte.charAt(2) - 'a';
+        int arrY = 8 - Character.getNumericValue(coupTexte.charAt(3));
+
+        java.awt.Point depart = new java.awt.Point(depX, depY);
+        java.awt.Point arrivee = new java.awt.Point(arrX, arrY);
+
+        Coup coup = new Coup(depart, arrivee);
+
+        if (coupTexte.length() == 5) {
+            char promo = coupTexte.charAt(4);
+            Piece nouvellePiece = null;
+            if (promo == 'q')
+                nouvellePiece = new Queen(joueurCourant.getCouleur());
+            this.choixPromotion = nouvellePiece;
+        }
+
+        // On applique le coup reçu
+        appliquerCoup(coup);
+        passerTour();
+    }
+
+    /**
+     * Active le mode réseau après la création de la partie
+     */
+    public void activerReseau(boolean estHote, String ip, int port) {
+        this.estEnReseau = true;
+        this.reseauManager = new ReseauManager();
+
+        if (estHote) {
+            System.out.println("Démarrage du Serveur...");
+            // L'hôte écoute sur le port. Quand un message arrive, on joue le coup.
+            reseauManager.hebergerPartie(port, coupTexte -> recevoirCoupReseau(coupTexte));
+        } else {
+            System.out.println("Connexion au Serveur...");
+            // Le client se connecte à l'IP. Quand un message arrive, on joue le coup.
+            reseauManager.rejoindrePartie(ip, port, coupTexte -> recevoirCoupReseau(coupTexte));
+        }
     }
 }
