@@ -49,11 +49,11 @@ public class PlayerInfoPanel extends JPanel {
 
         // Pion indicateur de couleur
         JLabel pion = new JLabel(estBlanc ? "♔" : "♚");
-        pion.setFont(new Font("Serif", Font.PLAIN, 18));
+        pion.setFont(new Font("Serif", Font.PLAIN, 28));
         pion.setForeground(estBlanc ? BLANC_PIECE : new Color(80, 80, 80));
 
         labelNom = new JLabel(nomJoueur);
-        labelNom.setFont(new Font("Serif", Font.BOLD, 16));
+        labelNom.setFont(new Font("Serif", Font.BOLD, 19));
         labelNom.setForeground(OR);
 
         gauchePanel.add(pion);
@@ -68,7 +68,7 @@ public class PlayerInfoPanel extends JPanel {
             }
         };
         piecesPanel.setOpaque(false);
-        piecesPanel.setPreferredSize(new Dimension(250, 30));
+        piecesPanel.setPreferredSize(new Dimension(250, 40));
 
         // ── Droite : timer ───────────────────────────────────────
         labelTimer = new JLabel("");

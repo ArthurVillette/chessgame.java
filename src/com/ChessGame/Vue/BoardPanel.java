@@ -19,7 +19,6 @@ import java.util.List;
 public class BoardPanel extends JPanel implements Observer {
     private final Board board;
     private Partie partie;
-
     public static final int TILE_SIZE = ChessFrame.TILE_SIZE;
     public static final int MARGE     = Math.max(30, ChessFrame.TILE_SIZE / 4);
     private boolean estRetourne = false; // true si joueur joue Noir

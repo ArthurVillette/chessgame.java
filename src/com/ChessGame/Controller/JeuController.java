@@ -63,6 +63,10 @@ public class JeuController implements Runnable {
         frame.setOnForfait(this::gererForfait);
         frame.setOnPause(this::togglePause);
 
+        if (frame.getEvaluationPanel().isVisible()) {
+            this.SetEstEvaluer(true);
+        }
+
         SettingPanel menu = frame.getSettingPanel();
 
         menu.getItemJauge().addActionListener(e -> {

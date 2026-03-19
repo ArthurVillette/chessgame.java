@@ -20,6 +20,7 @@ public class ChessFrame extends JFrame {
     // ── Palette ───────────────────────────────────────────────────
     private static final Color FOND         = new Color(28, 32, 28);
     private static final Color FOND_PANNEAU = new Color(40, 46, 40);
+    private static final Color FOND_ECHEQUIER = new Color(230, 225, 210);
     private static final Color FOND_HISTO   = new Color(34, 38, 34);
     private static final Color BEIGE        = new Color(235, 235, 208);
     private static final Color BORDURE      = new Color(65, 75, 60);
@@ -91,7 +92,7 @@ public class ChessFrame extends JFrame {
 
         // Jauge gauche
         evaluationPanel = new EvaluationPanel();
-        evaluationPanel.setVisible(false);
+        evaluationPanel.setVisible(true);
         JPanel jaugeWrapper = new JPanel(new BorderLayout());
         jaugeWrapper.setBackground(FOND);
         jaugeWrapper.setBorder(new EmptyBorder(50, 0, 50, 6));
@@ -100,6 +101,7 @@ public class ChessFrame extends JFrame {
 
         // Centre
         boardPanel      = new BoardPanel(board);
+        boardPanel.setBackground(FOND_ECHEQUIER);
         panelJoueurHaut = new PlayerInfoPanel(false, nomNoir);
         panelJoueurBas  = new PlayerInfoPanel(true,  nomBlanc);
 
@@ -130,6 +132,7 @@ public class ChessFrame extends JFrame {
     private JPanel creerPanneauDroit() {
         JPanel p = new JPanel(new BorderLayout(0, 6));
         p.setBackground(FOND);
+        p.setPreferredSize(new Dimension(230, 0));
         p.add(creerBarreActions(), BorderLayout.NORTH);
 
         JPanel carte = new JPanel(new BorderLayout());
@@ -137,8 +140,8 @@ public class ChessFrame extends JFrame {
         carte.setBorder(BorderFactory.createLineBorder(BORDURE, 1, true));
 
         JLabel titre = new JLabel("  ♟  Historique des coups");
-        titre.setFont(new Font("Serif", Font.BOLD, 13));
-        titre.setForeground(BEIGE);
+        titre.setFont(new Font("Serif", Font.BOLD, 16));
+        titre.setForeground(OR);
         titre.setOpaque(true);
         titre.setBackground(FOND_PANNEAU);
         titre.setBorder(new CompoundBorder(
