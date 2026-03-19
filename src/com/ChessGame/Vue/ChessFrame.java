@@ -18,7 +18,7 @@ public class ChessFrame extends JFrame {
     public static final int TILE_SIZE = calculerTileSize();
 
     // ── Palette ───────────────────────────────────────────────────
-    private static final Color FOND         = new Color(28, 32, 28);
+    /*private static final Color FOND         = new Color(28, 32, 28);
     private static final Color FOND_PANNEAU = new Color(40, 46, 40);
     private static final Color FOND_ECHEQUIER = new Color(230, 225, 210);
     private static final Color FOND_HISTO   = new Color(34, 38, 34);
@@ -30,7 +30,20 @@ public class ChessFrame extends JFrame {
     private static final Color ROUGE_BTN    = new Color(100, 50, 50);
     private static final Color ROUGE_HOVER  = new Color(130, 65, 65);
     private static final Color GRIS_BTN     = new Color(55, 62, 55);
-    private static final Color GRIS_TEXTE   = new Color(190, 195, 180);
+    private static final Color GRIS_TEXTE   = new Color(190, 195, 180);*/
+    private static final Color FOND         = new Color(22, 28, 22);
+    private static final Color FOND_PANNEAU = new Color(37, 43, 37);
+    private static final Color FOND_HISTO   = new Color(26, 30, 26);
+    private static final Color BEIGE        = new Color(232, 222, 195);
+    private static final Color BORDURE      = new Color(80, 70, 45);
+    private static final Color OR           = new Color(201, 162, 39);
+    private static final Color OR_CLAIR      = new Color(244, 194, 122);
+    private static final Color VERT_BTN     = new Color(55, 90, 55);
+    private static final Color VERT_HOVER   = new Color(75, 115, 70);
+    private static final Color ROUGE_BTN    = new Color(100, 45, 45);
+    private static final Color ROUGE_HOVER  = new Color(130, 58, 58);
+    private static final Color GRIS_BTN     = new Color(50, 58, 50);
+    private static final Color GRIS_TEXTE   = new Color(190, 185, 165);
 
     // ── Composants ────────────────────────────────────────────────
     private final BoardPanel      boardPanel;
@@ -65,7 +78,7 @@ public class ChessFrame extends JFrame {
         Dimension ecran = Toolkit.getDefaultToolkit().getScreenSize();
         int hauteurDispo = (int)(ecran.height * 0.88) - 30;
         int taille = (hauteurDispo - 2*30 - 2*46 - 24) / 8;
-        return Math.max(56, Math.min(90, taille));
+        return Math.max(35, Math.min(60, taille));
     }
 
     // ── Constructeurs ─────────────────────────────────────────────
@@ -95,22 +108,36 @@ public class ChessFrame extends JFrame {
         evaluationPanel.setVisible(true);
         JPanel jaugeWrapper = new JPanel(new BorderLayout());
         jaugeWrapper.setBackground(FOND);
-        jaugeWrapper.setBorder(new EmptyBorder(50, 0, 50, 6));
+        jaugeWrapper.setBorder(new EmptyBorder(50, 0, 50, 8));
         jaugeWrapper.add(evaluationPanel, BorderLayout.CENTER);
         root.add(jaugeWrapper, BorderLayout.WEST);
 
+        // Label au-dessus de la jauge
+        JLabel labelJauge = new JLabel("EVAL", SwingConstants.CENTER);
+        labelJauge.setFont(new Font("SansSerif", Font.BOLD, 13));
+        labelJauge.setForeground(Color.RED);
+        labelJauge.setBorder(new EmptyBorder(0, 0, 4, 0));
+
+        jaugeWrapper.add(labelJauge,    BorderLayout.NORTH);
+        jaugeWrapper.add(evaluationPanel, BorderLayout.CENTER);
+        root.add(jaugeWrapper, BorderLayout.WEST);
+        root.add(creerEntete(), BorderLayout.NORTH);
+
         // Centre
         boardPanel      = new BoardPanel(board);
-        boardPanel.setBackground(FOND_ECHEQUIER);
+        boardPanel.setBackground(FOND);
+        boardPanel.setBackground(new Color(44, 32, 16)); // marron fonce derriere plateau
+
         panelJoueurHaut = new PlayerInfoPanel(false, nomNoir);
         panelJoueurBas  = new PlayerInfoPanel(true,  nomBlanc);
 
-        JPanel centrePanel = new JPanel(new BorderLayout(0, 4));
+        JPanel centrePanel = new JPanel(new BorderLayout(2, 3));
         centrePanel.setBackground(FOND);
         centrePanel.add(panelJoueurHaut, BorderLayout.NORTH);
         centrePanel.add(boardPanel,      BorderLayout.CENTER);
         centrePanel.add(panelJoueurBas,  BorderLayout.SOUTH);
         root.add(centrePanel, BorderLayout.CENTER);
+        root.add(creerFooter(), BorderLayout.SOUTH);
 
         // Droite
         root.add(creerPanneauDroit(), BorderLayout.EAST);
@@ -121,6 +148,32 @@ public class ChessFrame extends JFrame {
         setContentPane(root);
         pack();
         setLocationRelativeTo(null);
+
+
+    }
+
+    // ── Panneau droit ─────────────────────────────────────────────
+    private JPanel creerEntete() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(new Color(18, 22, 18));
+        p.setBorder(new EmptyBorder(6, 10, 6, 10));
+
+        JLabel titre = new JLabel("  Poisson Bloque");
+        titre.setFont(new Font("Serif", Font.BOLD, 16));
+        titre.setForeground(OR);
+        p.add(titre, BorderLayout.WEST);
+
+        // Ligne or en bas
+        JPanel ligne = new JPanel() {
+            @Override protected void paintComponent(Graphics g) {
+                g.setColor(OR);
+                g.fillRect(0, getHeight()-2, getWidth(), 2);
+            }
+        };
+        ligne.setOpaque(false);
+        ligne.setPreferredSize(new Dimension(0, 2));
+        p.add(ligne, BorderLayout.SOUTH);
+        return p;
     }
 
     // ── Panneau droit ─────────────────────────────────────────────
@@ -252,6 +305,28 @@ public class ChessFrame extends JFrame {
         return btn;
     }
 
+    private JPanel creerFooter() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(new Color(18, 22, 18));
+        p.setBorder(new EmptyBorder(5, 10, 5, 10));
+
+        JPanel ligne = new JPanel() {
+            @Override protected void paintComponent(Graphics g) {
+                g.setColor(OR);
+                g.fillRect(0, 0, getWidth(), 2);
+            }
+        };
+        ligne.setOpaque(false);
+        ligne.setPreferredSize(new Dimension(0, 2));
+        p.add(ligne, BorderLayout.NORTH);
+
+        JLabel texte = new JLabel("Jouez. Analysez. ", SwingConstants.CENTER);
+        texte.setFont(new Font("Serif", Font.ITALIC, 12));
+        texte.setForeground(new Color(140, 120, 60));
+        p.add(texte, BorderLayout.CENTER);
+        return p;
+    }
+
     // ── Dialog options ────────────────────────────────────────────
 
     /**
@@ -279,7 +354,7 @@ public class ChessFrame extends JFrame {
         titreLabel.setFont(new Font("Serif", Font.BOLD, 15));
         titreLabel.setForeground(BEIGE);
 
-        JPanel checkPanel = new JPanel(new GridLayout(2, 1, 0, 10));
+        JPanel checkPanel = new JPanel(new GridLayout(2, 1, 0, 8));
         checkPanel.setOpaque(false);
         JCheckBox cbJauge = creerCB("Afficher la jauge d'évaluation", evaluationPanel.isVisible());
         JCheckBox cbHisto = creerCB("Afficher l'historique des coups",

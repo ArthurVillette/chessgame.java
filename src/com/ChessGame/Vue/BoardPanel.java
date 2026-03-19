@@ -24,6 +24,7 @@ public class BoardPanel extends JPanel implements Observer {
     private boolean estRetourne = false; // true si joueur joue Noir
     private int selectedX = -1;
     private int selectedY = -1;
+
     private final Map<String, Image> imageCache = new HashMap<>();
 
     private List<Point> casesPossibles = new ArrayList<>();
@@ -36,6 +37,9 @@ public class BoardPanel extends JPanel implements Observer {
         this.board = board;
         setPreferredSize(new Dimension(8 * TILE_SIZE + 2 * MARGE, 8 * TILE_SIZE + 2 * MARGE));
         loadAllImages();
+
+
+
     }
 
     /**
@@ -113,7 +117,7 @@ public class BoardPanel extends JPanel implements Observer {
      * @param g Le contexte graphique pour dessiner les coordonnées
      */
     private void drawCoordinates(Graphics g) {
-        g.setColor(Color.BLACK); // Ou Color.WHITE si votre fond de fenêtre est sombre
+        g.setColor(new Color(201, 162, 39)); // Ou Color.WHITE si votre fond de fenêtre est sombre
         g.setFont(new Font("Arial", Font.BOLD, 14));
         FontMetrics fm = g.getFontMetrics();
 
