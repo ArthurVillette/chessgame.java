@@ -42,6 +42,7 @@ public class Partie extends Observable {
     private boolean estEnReseau = false;
     private final HashMap<String, Integer> positionsVues = new HashMap<>();
     private boolean tripleRepetition = false;
+    private int choixIA = 0;
 
     /**
      * Constructeur de la classe Partie
@@ -51,8 +52,9 @@ public class Partie extends Observable {
      * @param humainEstBlanc Indique si le joueur humain joue avec les pièces
      *                       blanches
      */
-    public Partie(Board board, boolean contreIA, boolean humainEstBlanc) {
+    public Partie(Board board, boolean contreIA, boolean humainEstBlanc, int choixIA) {
         this.board = board;
+        this.choixIA = choixIA;
         this.contreIA = contreIA;
         this.humainEstBlanc = humainEstBlanc;
         this.moteurStockfish = new IAClient();
@@ -64,12 +66,19 @@ public class Partie extends Observable {
 
         if (this.contreIA) {
             this.moteurVillette = new IAClient();
-            this.villetteActif = this.moteurVillette
-                    .demarrerMoteur(Config.get("CHEMIN_VILLETTE", "./lanceur_villette.sh"));
+            if (choixIA == 1) {
+
+                this.villetteActif = this.moteurVillette
+                        .demarrerMoteur(Config.get("CHEMIN_VILLETTE", "./lanceur_villette.sh"));
+            } else if (choixIA == 2) {
+                this.villetteActif = this.moteurVillette
+                        .demarrerMoteur(Config.get("CHEMIN_STOCKFISH", "stockfish"));
+            }
             if (this.villetteActif) {
                 this.moteurVillette.envoyerCommande("uci");
                 this.moteurVillette.lireReponseComplete("uciok");
             }
+
         }
 
         if (!this.contreIA) {
@@ -103,7 +112,9 @@ public class Partie extends Observable {
         return jNoir;
     }
 
-    public boolean isTripleRepetition() { return tripleRepetition; }
+    public boolean isTripleRepetition() {
+        return tripleRepetition;
+    }
 
     /**
      * Permet d'obtenir le plateau de jeu actuel
@@ -208,8 +219,6 @@ public class Partie extends Observable {
         notifyObservers(new EvenementMouvement());
         enregistrerPosition();
     }
-
-
 
     /**
      * Notifie PromotionDialog via EvenementPromotion, puis BLOQUE
@@ -403,8 +412,7 @@ public class Partie extends Observable {
         if (tripleRepetition) {
             genererFichiersFinDePartie("1/2-1/2");
             return true;
-        }
-       else if (roiEnEchecEtMat(jBlanc)) {
+        } else if (roiEnEchecEtMat(jBlanc)) {
             System.out.println("Échec et mat ! Les noirs gagnent !");
             genererFichiersFinDePartie("0-1");
             return true;
@@ -684,14 +692,16 @@ public class Partie extends Observable {
         }
     }
 
-
     private void enregistrerPosition() {
         String fen = board.toFEN(joueurCourant.isWhite());
         String cle = fen.substring(0, fen.lastIndexOf(" 0 1"));
         int count = positionsVues.getOrDefault(cle, 0) + 1;
         positionsVues.put(cle, count);
-        if (count >= 3) tripleRepetition = true;
+        if (count >= 3)
+            tripleRepetition = true;
     }
 
-    public List<String> getHistoriquePGN() { return historiquePGN; }
+    public List<String> getHistoriquePGN() {
+        return historiquePGN;
+    }
 }

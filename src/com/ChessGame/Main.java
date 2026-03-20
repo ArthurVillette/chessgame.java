@@ -39,6 +39,7 @@ public class Main {
         boolean humainEstBlanc = menu.isHumainEstBlanc();
         String nomJoueur = menu.getNomJoueur(); // ← nom du joueur
         int timerMinutes = menu.getTimerMinutes();
+        int choixIA = menu.getChoixIA(); // ← choix de l'IA (1 ou 2)
         String nomBlanc, nomNoir;
         if (!contreIA) {
             // Humain vs Humain : joueur 1 = Blancs, joueur 2 = Noirs
@@ -53,14 +54,14 @@ public class Main {
         }
         Board board = new Board();
         ChessFrame frame = new ChessFrame(board, nomBlanc, nomNoir, timerMinutes);
-        Partie partie = new Partie(board, contreIA, humainEstBlanc);
+        Partie partie = new Partie(board, contreIA, humainEstBlanc, choixIA);
 
         BoardPanel boardPanel = frame.getBoardPanel();
         // EvaluationPanel evaluationPanel = new EvaluationPanel();
 
         partie.addObserver(frame.getBoardPanel());
         frame.getBoardPanel().setPartie(partie);
-       // Vue console (Observer supplémentaire)
+        // Vue console (Observer supplémentaire)
         VueConsole vueConsole = new VueConsole();
         partie.addObserver(vueConsole);
         vueConsole.afficherPositionInitiale(board);
