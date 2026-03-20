@@ -139,9 +139,44 @@ public class Board {
         // 3. Roque, En passant, Demi-coups, Coups (Simplifié pour l'instant)
         // "KQkq" signifie que tout le monde peut roquer. "-" signifie pas de prise en
         // passant.
-        fen.append("- - 0 1");
+        //fen.append("- - 0 1");
+
+        // 3. Droits de roque
+        StringBuilder roque = new StringBuilder();
+        Piece roiBlanc = getPiece(4, 7);
+        Piece tourH1   = getPiece(7, 7);
+        Piece tourA1   = getPiece(0, 7);
+        Piece roiNoir  = getPiece(4, 0);
+        Piece tourH8   = getPiece(7, 0);
+        Piece tourA8   = getPiece(0, 0);
+
+        if (peutRoquer(roiBlanc, tourH1)) roque.append("K");
+        if (peutRoquer(roiBlanc, tourA1)) roque.append("Q");
+        if (peutRoquer(roiNoir,  tourH8)) roque.append("k");
+        if (peutRoquer(roiNoir,  tourA8)) roque.append("q");
+        fen.append(roque.length() > 0 ? roque : "-");
+        fen.append(" ");
+
+        // 4. Case en passant
+        String enPassant = "-";
+        if (dernierCoup != null) {
+            Piece p = getPiece(dernierCoup.arrivee.x, dernierCoup.arrivee.y);
+            if (p instanceof Bishop.Pawn
+                    && Math.abs(dernierCoup.arrivee.y - dernierCoup.depart.y) == 2) {
+                int epX = dernierCoup.arrivee.x;
+                int epY = (dernierCoup.depart.y + dernierCoup.arrivee.y) / 2;
+                enPassant = "" + (char)('a' + epX) + (8 - epY);
+            }
+        }
+        fen.append(enPassant);
+        fen.append(" 0 1");
+
 
         return fen.toString();
+    }
+    private boolean peutRoquer(Piece roi, Piece tour) {
+        return roi  instanceof King && !((King) roi).aBouge()
+                && tour instanceof Rook && !((Rook) tour).aBouge();
     }
 
 }

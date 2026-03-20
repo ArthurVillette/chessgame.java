@@ -18,7 +18,7 @@ public class PopupFinPartie extends JDialog {
     private static final Color OR          = new Color(212, 175, 55);
     private static final Color ROUGE       = new Color(180, 60, 60);
 
-    public enum TypeFin { ECHEC_MAT, PAT, FORFAIT, TIMEOUT }
+    public enum TypeFin { ECHEC_MAT, PAT, FORFAIT, TIMEOUT,REPETITION}
 
     /**
      * @param parent   fenêtre parente
@@ -66,6 +66,10 @@ public class PopupFinPartie extends JDialog {
                 icone = "⏱"; titre = gagnant + " gagne !";
                 sousTitre = "Victoire au temps";
                 couleurTitre = OR; break;
+            case REPETITION:
+                icone = "♻"; titre = "Match nul";
+                sousTitre = "Triple répétition de position";
+                couleurTitre = BEIGE; break;
             default:
                 icone = "♟"; titre = "Fin de partie";
                 sousTitre = ""; couleurTitre = BEIGE;

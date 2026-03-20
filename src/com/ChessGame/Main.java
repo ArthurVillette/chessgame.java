@@ -60,6 +60,10 @@ public class Main {
 
         partie.addObserver(frame.getBoardPanel());
         frame.getBoardPanel().setPartie(partie);
+       // Vue console (Observer supplémentaire)
+        VueConsole vueConsole = new VueConsole();
+        partie.addObserver(vueConsole);
+        vueConsole.afficherPositionInitiale(board);
         PromotionDialog promotionDialog = new PromotionDialog(partie);
 
         ChessController controller = new ChessController(board, frame, partie);
