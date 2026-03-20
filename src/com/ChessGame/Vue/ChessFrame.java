@@ -9,8 +9,11 @@ import com.ChessGame.Model.ChessPieces.Piece;
 import java.awt.*;
 
 /**
- * Classe représentant la fenêtre principale du jeu d'échecs, contenant le plateau, la jauge d'évaluation, l'historique des coups et les informations des joueurs.
- * La classe gère également les interactions avec les boutons de contrôle (pause, abandon, options)
+ * Classe représentant la fenêtre principale du jeu d'échecs, contenant le
+ * plateau, la jauge d'évaluation, l'historique des coups et les informations
+ * des joueurs.
+ * La classe gère également les interactions avec les boutons de contrôle
+ * (pause, abandon, options)
  * et affiche une boîte de dialogue personnalisée pour les options d'affichage.
  */
 public class ChessFrame extends JFrame {
@@ -18,39 +21,27 @@ public class ChessFrame extends JFrame {
     public static final int TILE_SIZE = calculerTileSize();
 
     // ── Palette ───────────────────────────────────────────────────
-    /*private static final Color FOND         = new Color(28, 32, 28);
-    private static final Color FOND_PANNEAU = new Color(40, 46, 40);
-    private static final Color FOND_ECHEQUIER = new Color(230, 225, 210);
-    private static final Color FOND_HISTO   = new Color(34, 38, 34);
-    private static final Color BEIGE        = new Color(235, 235, 208);
-    private static final Color BORDURE      = new Color(65, 75, 60);
-    private static final Color OR           = new Color(212, 175, 55);
-    private static final Color VERT_BTN     = new Color(75, 105, 65);
-    private static final Color VERT_HOVER   = new Color(95, 130, 80);
-    private static final Color ROUGE_BTN    = new Color(100, 50, 50);
-    private static final Color ROUGE_HOVER  = new Color(130, 65, 65);
-    private static final Color GRIS_BTN     = new Color(55, 62, 55);
-    private static final Color GRIS_TEXTE   = new Color(190, 195, 180);*/
-    private static final Color FOND         = new Color(22, 28, 22);
+
+    private static final Color FOND = new Color(22, 28, 22);
     private static final Color FOND_PANNEAU = new Color(37, 43, 37);
-    private static final Color FOND_HISTO   = new Color(26, 30, 26);
-    private static final Color BEIGE        = new Color(232, 222, 195);
-    private static final Color BORDURE      = new Color(80, 70, 45);
-    private static final Color OR           = new Color(201, 162, 39);
-    private static final Color OR_CLAIR      = new Color(244, 194, 122);
-    private static final Color VERT_BTN     = new Color(55, 90, 55);
-    private static final Color VERT_HOVER   = new Color(75, 115, 70);
-    private static final Color ROUGE_BTN    = new Color(100, 45, 45);
-    private static final Color ROUGE_HOVER  = new Color(130, 58, 58);
-    private static final Color GRIS_BTN     = new Color(50, 58, 50);
-    private static final Color GRIS_TEXTE   = new Color(190, 185, 165);
+    private static final Color FOND_HISTO = new Color(26, 30, 26);
+    private static final Color BEIGE = new Color(232, 222, 195);
+    private static final Color BORDURE = new Color(80, 70, 45);
+    private static final Color OR = new Color(201, 162, 39);
+    private static final Color OR_CLAIR = new Color(244, 194, 122);
+    private static final Color VERT_BTN = new Color(55, 90, 55);
+    private static final Color VERT_HOVER = new Color(75, 115, 70);
+    private static final Color ROUGE_BTN = new Color(100, 45, 45);
+    private static final Color ROUGE_HOVER = new Color(130, 58, 58);
+    private static final Color GRIS_BTN = new Color(50, 58, 50);
+    private static final Color GRIS_TEXTE = new Color(190, 185, 165);
 
     // ── Composants ────────────────────────────────────────────────
-    private final BoardPanel      boardPanel;
+    private final BoardPanel boardPanel;
     private final EvaluationPanel evaluationPanel;
-    private JTextArea       historiqueArea;
-    private JScrollPane     scrollPaneHistorique;
-    private final SettingPanel    settingPanel;
+    private JTextArea historiqueArea;
+    private JScrollPane scrollPaneHistorique;
+    private final SettingPanel settingPanel;
     private final PlayerInfoPanel panelJoueurHaut;
     private final PlayerInfoPanel panelJoueurBas;
 
@@ -62,35 +53,37 @@ public class ChessFrame extends JFrame {
     private Runnable onForfait;
     private Runnable onPause;
     private Runnable onNouvellePartie;
-    private final int timerMinutes ;
-    //------------------
+    private final int timerMinutes;
+    // ------------------
     private ChessController chessController;
     private Runnable onJaugeToggle;
-
 
     // ── TILE_SIZE dynamique ───────────────────────────────────────
 
     /**
-     * Calcule une taille de tuile adaptée à la taille de l'écran, avec des limites pour éviter les tailles extrêmes
+     * Calcule une taille de tuile adaptée à la taille de l'écran, avec des limites
+     * pour éviter les tailles extrêmes
+     * 
      * @return la taille de tuile calculée
      */
     private static int calculerTileSize() {
         Dimension ecran = Toolkit.getDefaultToolkit().getScreenSize();
-        int hauteurDispo = (int)(ecran.height * 0.88) - 30;
-        int taille = (hauteurDispo - 2*30 - 2*46 - 24) / 8;
-        return Math.max(35, Math.min(60, taille));
+        int hauteurDispo = (int) (ecran.height * 0.88) - 30;
+        int taille = (hauteurDispo - 2 * 30 - 2 * 46 - 24) / 8;
+        return Math.max(70, Math.min(100, taille));
     }
 
     // ── Constructeurs ─────────────────────────────────────────────
 
-
     /**
      * Constructeur principal de la fenêtre de jeu d'échecs
-     * @param board le modèle du plateau d'échecs
-     * @param nomBlanc le nom du joueur blanc
-     * @param nomNoir le nom du joueur noir
-     * @param timerMinutes le temps initial en minutes pour chaque joueur (0 = pas de
-
+     * 
+     * @param board        le modèle du plateau d'échecs
+     * @param nomBlanc     le nom du joueur blanc
+     * @param nomNoir      le nom du joueur noir
+     * @param timerMinutes le temps initial en minutes pour chaque joueur (0 = pas
+     *                     de
+     * 
      */
     public ChessFrame(Board board, String nomBlanc, String nomNoir, int timerMinutes) {
         setTitle("♟ Poisson Bloqué");
@@ -118,24 +111,24 @@ public class ChessFrame extends JFrame {
         labelJauge.setForeground(Color.RED);
         labelJauge.setBorder(new EmptyBorder(0, 0, 4, 0));
 
-        jaugeWrapper.add(labelJauge,    BorderLayout.NORTH);
+        jaugeWrapper.add(labelJauge, BorderLayout.NORTH);
         jaugeWrapper.add(evaluationPanel, BorderLayout.CENTER);
         root.add(jaugeWrapper, BorderLayout.WEST);
         root.add(creerEntete(), BorderLayout.NORTH);
 
         // Centre
-        boardPanel      = new BoardPanel(board);
+        boardPanel = new BoardPanel(board);
         boardPanel.setBackground(FOND);
         boardPanel.setBackground(new Color(44, 32, 16)); // marron fonce derriere plateau
 
         panelJoueurHaut = new PlayerInfoPanel(false, nomNoir);
-        panelJoueurBas  = new PlayerInfoPanel(true,  nomBlanc);
+        panelJoueurBas = new PlayerInfoPanel(true, nomBlanc);
 
         JPanel centrePanel = new JPanel(new BorderLayout(2, 3));
         centrePanel.setBackground(FOND);
         centrePanel.add(panelJoueurHaut, BorderLayout.NORTH);
-        centrePanel.add(boardPanel,      BorderLayout.CENTER);
-        centrePanel.add(panelJoueurBas,  BorderLayout.SOUTH);
+        centrePanel.add(boardPanel, BorderLayout.CENTER);
+        centrePanel.add(panelJoueurBas, BorderLayout.SOUTH);
         root.add(centrePanel, BorderLayout.CENTER);
         root.add(creerFooter(), BorderLayout.SOUTH);
 
@@ -148,7 +141,6 @@ public class ChessFrame extends JFrame {
         setContentPane(root);
         pack();
         setLocationRelativeTo(null);
-
 
     }
 
@@ -165,9 +157,10 @@ public class ChessFrame extends JFrame {
 
         // Ligne or en bas
         JPanel ligne = new JPanel() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 g.setColor(OR);
-                g.fillRect(0, getHeight()-2, getWidth(), 2);
+                g.fillRect(0, getHeight() - 2, getWidth(), 2);
             }
         };
         ligne.setOpaque(false);
@@ -179,7 +172,9 @@ public class ChessFrame extends JFrame {
     // ── Panneau droit ─────────────────────────────────────────────
 
     /**
-     * Crée le panneau droit de la fenêtre, contenant la barre d'actions et l'historique des coups
+     * Crée le panneau droit de la fenêtre, contenant la barre d'actions et
+     * l'historique des coups
+     * 
      * @return le panneau droit construit
      */
     private JPanel creerPanneauDroit() {
@@ -225,9 +220,9 @@ public class ChessFrame extends JFrame {
         lf.setForeground(OR);
         footer.add(lf);
 
-        carte.add(titre,                BorderLayout.NORTH);
+        carte.add(titre, BorderLayout.NORTH);
         carte.add(scrollPaneHistorique, BorderLayout.CENTER);
-        carte.add(footer,               BorderLayout.SOUTH);
+        carte.add(footer, BorderLayout.SOUTH);
         p.add(carte, BorderLayout.CENTER);
         return p;
     }
@@ -235,14 +230,15 @@ public class ChessFrame extends JFrame {
     // ── Barre d'actions ───────────────────────────────────────────
 
     /**
-     * Crée la barre d'actions en haut à droite, contenant les boutons Pause/Play, Abandonner et Options
+     * Crée la barre d'actions en haut à droite, contenant les boutons Pause/Play,
+     * Abandonner et Options
+     * 
      * @return le JPanel contenant la barre d'actions construite
      */
     private JPanel creerBarreActions() {
         JPanel barre = new JPanel(new GridLayout(1, 3, 6, 0));
         barre.setBackground(FOND);
-        barre.
-                setPreferredSize(new Dimension(0, 40));
+        barre.setPreferredSize(new Dimension(0, 40));
 
         // ▶/⏸ Pause — toggle
         btnPause = creerBtnIcone("⏸", VERT_BTN, VERT_HOVER);
@@ -256,7 +252,8 @@ public class ChessFrame extends JFrame {
             int rep = JOptionPane.showConfirmDialog(this,
                     "Voulez-vous vraiment abandonner ?", "Abandon",
                     JOptionPane.YES_NO_OPTION);
-            if (rep == JOptionPane.YES_OPTION && onForfait != null) onForfait.run();
+            if (rep == JOptionPane.YES_OPTION && onForfait != null)
+                onForfait.run();
         });
 
         // ⚙ Options — ouvre dialog ET met en pause
@@ -265,9 +262,11 @@ public class ChessFrame extends JFrame {
         btnOpts.addActionListener(e -> {
             // Met en pause automatiquement si pas déjà en pause
             boolean etaitEnPause = enPause;
-            if (!enPause) togglePauseUI();
+            if (!enPause)
+                togglePauseUI();
             afficherDialogParams();
-            if (!etaitEnPause && enPause) togglePauseUI();
+            if (!etaitEnPause && enPause)
+                togglePauseUI();
         });
 
         barre.add(btnPause);
@@ -281,13 +280,16 @@ public class ChessFrame extends JFrame {
         enPause = !enPause;
         btnPause.setText(enPause ? "▶" : "⏸");
         btnPause.setToolTipText(enPause ? "Reprendre" : "Pause");
-        if (chessController != null) chessController.setEnPause(enPause);
-        if (onPause != null) onPause.run();
+        if (chessController != null)
+            chessController.setEnPause(enPause);
+        if (onPause != null)
+            onPause.run();
     }
 
     private JButton creerBtnIcone(String icone, Color fond, Color hover) {
         JButton btn = new JButton(icone) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getModel().isRollover() ? hover : fond);
@@ -311,7 +313,8 @@ public class ChessFrame extends JFrame {
         p.setBorder(new EmptyBorder(5, 10, 5, 10));
 
         JPanel ligne = new JPanel() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 g.setColor(OR);
                 g.fillRect(0, 0, getWidth(), 2);
             }
@@ -330,7 +333,10 @@ public class ChessFrame extends JFrame {
     // ── Dialog options ────────────────────────────────────────────
 
     /**
-     * Affiche une boîte de dialogue personnalisée pour les options d'affichage, permettant de basculer la visibilité de la jauge d'évaluation et de l'historique des coups. La boîte de dialogue est stylisée avec des couleurs et des boutons personnalisés,
+     * Affiche une boîte de dialogue personnalisée pour les options d'affichage,
+     * permettant de basculer la visibilité de la jauge d'évaluation et de
+     * l'historique des coups. La boîte de dialogue est stylisée avec des couleurs
+     * et des boutons personnalisés,
      * et applique les changements immédiatement après validation.
      */
     private void afficherDialogParams() {
@@ -338,7 +344,8 @@ public class ChessFrame extends JFrame {
         dialog.setUndecorated(true);
 
         JPanel p = new JPanel(new BorderLayout(0, 16)) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(FOND_PANNEAU);
@@ -376,7 +383,8 @@ public class ChessFrame extends JFrame {
             pack();
 
             settingPanel.getItemJauge().setSelected(cbJauge.isSelected());
-            if (onJaugeToggle != null) onJaugeToggle.run();
+            if (onJaugeToggle != null)
+                onJaugeToggle.run();
             if (scrollPaneHistorique != null)
                 scrollPaneHistorique.setVisible(cbHisto.isSelected());
             settingPanel.getItemNotation().setSelected(cbHisto.isSelected());
@@ -393,7 +401,7 @@ public class ChessFrame extends JFrame {
         corps.add(btnPanel);
 
         p.add(titreLabel, BorderLayout.NORTH);
-        p.add(corps,      BorderLayout.CENTER);
+        p.add(corps, BorderLayout.CENTER);
 
         dialog.setContentPane(p);
         dialog.pack();
@@ -413,7 +421,8 @@ public class ChessFrame extends JFrame {
 
     private JButton creerBtnDialog(String texte, Color fond, Color hover) {
         JButton btn = new JButton(texte) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getModel().isRollover() ? hover : fond);
@@ -432,18 +441,39 @@ public class ChessFrame extends JFrame {
     }
 
     // ── API publique ──────────────────────────────────────────────
-    public BoardPanel      getBoardPanel()           { return boardPanel; }
-    public EvaluationPanel getEvaluationPanel()      { return evaluationPanel; }
-    public JScrollPane     getScrollPaneHistorique() { return scrollPaneHistorique; }
-    public SettingPanel    getSettingPanel()          { return settingPanel; }
+    public BoardPanel getBoardPanel() {
+        return boardPanel;
+    }
 
-    public void setOnForfait(Runnable r)        { this.onForfait = r; }
-    public void setOnPause(Runnable r)          { this.onPause = r; }
-    public void setOnNouvellePartie(Runnable r) { this.onNouvellePartie = r; }
+    public EvaluationPanel getEvaluationPanel() {
+        return evaluationPanel;
+    }
+
+    public JScrollPane getScrollPaneHistorique() {
+        return scrollPaneHistorique;
+    }
+
+    public SettingPanel getSettingPanel() {
+        return settingPanel;
+    }
+
+    public void setOnForfait(Runnable r) {
+        this.onForfait = r;
+    }
+
+    public void setOnPause(Runnable r) {
+        this.onPause = r;
+    }
+
+    public void setOnNouvellePartie(Runnable r) {
+        this.onNouvellePartie = r;
+    }
 
     /**
      * Ajoute un texte à l'historique des coups,
-     * en scrollant automatiquement vers le bas pour afficher le dernier coup ajouté.
+     * en scrollant automatiquement vers le bas pour afficher le dernier coup
+     * ajouté.
+     * 
      * @param texte le texte à ajouter à l'historique (ex : "1. e4 e5 2. Nf3 Nc6")
      */
     public void ajouterCoup(String texte) {
@@ -451,32 +481,48 @@ public class ChessFrame extends JFrame {
         historiqueArea.setCaretPosition(historiqueArea.getDocument().getLength());
     }
 
-    public void mettreAJourJauge(double score) { evaluationPanel.setScore(score); }
+    public void mettreAJourJauge(double score) {
+        evaluationPanel.setScore(score);
+    }
 
     /**
-     * Ajoute une pièce capturée à l'affichage du joueur qui a capturé (parLesBlancs = true → joueur bas, sinon joueur haut)
-     * @param piece la pièce capturée à ajouter à l'affichage
-     * @param parLesBlancs true si la pièce a été capturée par les blancs (afficher dans panelJoueurBas), false si capturée par les noirs (afficher dans panelJoueurHaut)
+     * Ajoute une pièce capturée à l'affichage du joueur qui a capturé (parLesBlancs
+     * = true → joueur bas, sinon joueur haut)
+     * 
+     * @param piece        la pièce capturée à ajouter à l'affichage
+     * @param parLesBlancs true si la pièce a été capturée par les blancs (afficher
+     *                     dans panelJoueurBas), false si capturée par les noirs
+     *                     (afficher dans panelJoueurHaut)
      */
     public void ajouterPieceCaptured(Piece piece, boolean parLesBlancs) {
-        if (parLesBlancs) panelJoueurBas.ajouterPiece(piece);
-        else              panelJoueurHaut.ajouterPiece(piece);
+        if (parLesBlancs)
+            panelJoueurBas.ajouterPiece(piece);
+        else
+            panelJoueurHaut.ajouterPiece(piece);
     }
 
     /**
      * Met à jour le timer d'un joueur (en secondes), converti en mm:ss.
      * Le timer doit être initialisé au départ via le
-     * @param estBlanc true pour mettre à jour le timer du joueur blanc (panelJoueurBas), false pour le joueur noir (panelJoueurHaut)
+     * 
+     * @param estBlanc true pour mettre à jour le timer du joueur blanc
+     *                 (panelJoueurBas), false pour le joueur noir (panelJoueurHaut)
      * @param secondes le nombre de secondes restantes à afficher pour ce joueur
      */
     public void setTempsJoueur(boolean estBlanc, int secondes) {
-        if (estBlanc) panelJoueurBas.setTemps(secondes);
-        else          panelJoueurHaut.setTemps(secondes);
+        if (estBlanc)
+            panelJoueurBas.setTemps(secondes);
+        else
+            panelJoueurHaut.setTemps(secondes);
     }
 
     // Setter
-    public void setChessController(ChessController c) { this.chessController = c; }
-    public void setOnJaugeToggle(Runnable r) { this.onJaugeToggle = r; }
+    public void setChessController(ChessController c) {
+        this.chessController = c;
+    }
 
+    public void setOnJaugeToggle(Runnable r) {
+        this.onJaugeToggle = r;
+    }
 
 }

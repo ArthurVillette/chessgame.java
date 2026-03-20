@@ -33,8 +33,7 @@ public class JoueurIA extends Joueur {
         String fen = partie.getBoard().toFEN(isWhite());
 
         moteurIA.envoyerCommande("position fen " + fen);
-        moteurIA.envoyerCommande("go");
-
+        moteurIA.envoyerCommande("go movetime 1000");
         String reponse = moteurIA.lireReponseComplete("bestmove");
 
         String uciCoup = "";

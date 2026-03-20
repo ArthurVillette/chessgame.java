@@ -24,7 +24,7 @@ public class IAClient {
 
     public boolean demarrerMoteur(String chemin) {
         try {
-            processus = new ProcessBuilder(chemin).start();
+            processus = new ProcessBuilder(chemin.split(" ")).start();
             lecteur = new BufferedReader(new InputStreamReader(processus.getInputStream()));
             ecrivain = new OutputStreamWriter(processus.getOutputStream());
             return true;
@@ -33,9 +33,6 @@ public class IAClient {
             return false;
         }
     }
-
-
-
 
     /**
      * Envoie une commande texte au moteur (Protocole UCI)

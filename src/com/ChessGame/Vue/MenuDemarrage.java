@@ -11,22 +11,23 @@ import java.awt.event.*;
  */
 public class MenuDemarrage extends JDialog {
 
-    private boolean contreIA       = false;
+    private boolean contreIA = false;
     private boolean humainEstBlanc = true;
-    private boolean startClicked   = false;
-    private String  nomJoueur      = "Joueur";
-    private int     timerMinutes   = 0;
+    private boolean startClicked = false;
+    private String nomJoueur = "Joueur";
+    private int timerMinutes = 0;
+    private int choixIA = 0;
 
     // Palette de couleurs identique à ChessFrame
-    private static final Color FOND         = new Color(22, 28, 22);
+    private static final Color FOND = new Color(22, 28, 22);
     private static final Color FOND_PANNEAU = new Color(37, 43, 37);
-    private static final Color FOND_INPUT   = new Color(26, 30, 26);
-    private static final Color VERT         = new Color(55, 90, 55);
-    private static final Color VERT_HOVER   = new Color(75, 115, 70);
-    private static final Color BEIGE        = new Color(232, 222, 195);
-    private static final Color GRIS         = new Color(190, 185, 165);
-    private static final Color BORDURE      = new Color(80, 70, 45);
-    private static final Color OR           = new Color(201, 162, 39);
+    private static final Color FOND_INPUT = new Color(26, 30, 26);
+    private static final Color VERT = new Color(55, 90, 55);
+    private static final Color VERT_HOVER = new Color(75, 115, 70);
+    private static final Color BEIGE = new Color(232, 222, 195);
+    private static final Color GRIS = new Color(190, 185, 165);
+    private static final Color BORDURE = new Color(80, 70, 45);
+    private static final Color OR = new Color(201, 162, 39);
 
     private JPanel sectionCouleur;
 
@@ -40,25 +41,26 @@ public class MenuDemarrage extends JDialog {
 
         // Panneau principal avec coins arrondis et bordure Or
         JPanel root = new JPanel(new BorderLayout()) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(FOND);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
                 g2.setColor(BORDURE);
                 g2.setStroke(new BasicStroke(2));
-                g2.drawRoundRect(1, 1, getWidth()-3, getHeight()-3, 20, 20);
+                g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 20, 20);
             }
         };
         root.setOpaque(false);
         root.setBorder(new EmptyBorder(30, 40, 30, 40));
 
-        root.add(construireEntete(),      BorderLayout.NORTH);
-        root.add(construireCorps(),       BorderLayout.CENTER);
+        root.add(construireEntete(), BorderLayout.NORTH);
+        root.add(construireCorps(), BorderLayout.CENTER);
         root.add(construireBoutonJouer(), BorderLayout.SOUTH);
 
         setContentPane(root);
-        setBackground(new Color(0,0,0,0));
+        setBackground(new Color(0, 0, 0, 0));
     }
 
     private JPanel construireEntete() {
@@ -105,11 +107,19 @@ public class MenuDemarrage extends JDialog {
         JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         modePanel.setOpaque(false);
 
-        JToggleButton btnIA     = toggle("IA (Villette)", false, new Dimension(160, 45));
-        JToggleButton btnHumain = toggle("Humain Local",  true,  new Dimension(160, 45));
+        JToggleButton btnIA = toggle("IA (Villette)", false, new Dimension(160, 45));
+        JToggleButton btnIA2 = toggle("IA (Stockfish)", false, new Dimension(160, 45));
+        ButtonGroup grpIA = new ButtonGroup();
+        grpIA.add(btnIA);
+        grpIA.add(btnIA2);
+        JToggleButton btnHumain = toggle("Humain Local", true, new Dimension(160, 45));
         ButtonGroup grpMode = new ButtonGroup();
-        grpMode.add(btnIA); grpMode.add(btnHumain);
-        modePanel.add(btnIA); modePanel.add(btnHumain);
+        grpMode.add(btnIA);
+        grpMode.add(btnIA2);
+        grpMode.add(btnHumain);
+        modePanel.add(btnIA);
+        modePanel.add(btnIA2);
+        modePanel.add(btnHumain);
         corps.add(modePanel);
         corps.add(Box.createVerticalStrut(30));
 
@@ -122,11 +132,13 @@ public class MenuDemarrage extends JDialog {
         sectionCouleur.add(sectionLabel("VOTRE COULEUR"));
         JPanel colorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         colorPanel.setOpaque(false);
-        JToggleButton btnBlanc = toggle("Blancs ♔", true,  new Dimension(130, 40));
-        JToggleButton btnNoir  = toggle("Noirs ♚",  false, new Dimension(130, 40));
+        JToggleButton btnBlanc = toggle("Blancs ♔", true, new Dimension(130, 40));
+        JToggleButton btnNoir = toggle("Noirs ♚", false, new Dimension(130, 40));
         ButtonGroup grpColor = new ButtonGroup();
-        grpColor.add(btnBlanc); grpColor.add(btnNoir);
-        colorPanel.add(btnBlanc); colorPanel.add(btnNoir);
+        grpColor.add(btnBlanc);
+        grpColor.add(btnNoir);
+        colorPanel.add(btnBlanc);
+        colorPanel.add(btnNoir);
         sectionCouleur.add(colorPanel);
         sectionCouleur.add(Box.createVerticalStrut(30));
         corps.add(sectionCouleur);
@@ -135,8 +147,8 @@ public class MenuDemarrage extends JDialog {
         corps.add(sectionLabel("CADENCE DE JEU"));
         JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
         timerPanel.setOpaque(false);
-        String[] labelsT  = {"∞", "1m", "3m", "5m", "10m"};
-        int[]    valeursT = {0, 1, 3, 5, 10};
+        String[] labelsT = { "∞", "1m", "3m", "5m", "10m" };
+        int[] valeursT = { 0, 1, 3, 5, 10 };
         ButtonGroup grpTimer = new ButtonGroup();
         for (int i = 0; i < labelsT.length; i++) {
             final int val = valeursT[i];
@@ -148,10 +160,34 @@ public class MenuDemarrage extends JDialog {
         corps.add(timerPanel);
 
         // Logic des boutons
-        btnIA.addActionListener(e -> { contreIA = true; sectionCouleur.setVisible(true); revalidate(); repaint(); });
-        btnHumain.addActionListener(e -> { contreIA = false; sectionCouleur.setVisible(false); revalidate(); repaint(); });
+        btnIA.addActionListener(e -> {
+            contreIA = true;
+            choixIA = 1;
+            sectionCouleur.setVisible(true);
+            revalidate();
+            repaint();
+        });
+
+        btnIA2.addActionListener(e -> {
+            contreIA = true;
+            choixIA = 2;
+            sectionCouleur.setVisible(true);
+            revalidate();
+            repaint();
+        });
+
+        btnHumain.addActionListener(e -> {
+            contreIA = false;
+            choixIA = 0;
+            sectionCouleur.setVisible(false);
+            revalidate();
+            repaint();
+        });
+
         btnBlanc.addActionListener(e -> humainEstBlanc = true);
-        btnNoir.addActionListener(e ->  humainEstBlanc = false);
+        btnNoir.addActionListener(e -> humainEstBlanc = false);
+        btnBlanc.addActionListener(e -> humainEstBlanc = true);
+        btnNoir.addActionListener(e -> humainEstBlanc = false);
 
         return corps;
     }
@@ -162,7 +198,8 @@ public class MenuDemarrage extends JDialog {
         p.setBorder(new EmptyBorder(30, 0, 10, 0));
 
         JButton btn = new JButton("LANCER LA PARTIE") {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getModel().isRollover() ? VERT_HOVER : VERT);
@@ -177,7 +214,10 @@ public class MenuDemarrage extends JDialog {
         btn.setFocusPainted(false);
         btn.setPreferredSize(new Dimension(350, 60));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.addActionListener(e -> { startClicked = true; dispose(); });
+        btn.addActionListener(e -> {
+            startClicked = true;
+            dispose();
+        });
         p.add(btn);
         return p;
     }
@@ -208,13 +248,14 @@ public class MenuDemarrage extends JDialog {
 
     private JToggleButton toggle(String texte, boolean sel, Dimension dim) {
         JToggleButton btn = new JToggleButton(texte, sel) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(isSelected() ? VERT : FOND_PANNEAU);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
                 g2.setColor(isSelected() ? OR : BORDURE);
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 12, 12);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
                 super.paintComponent(g);
             }
         };
@@ -229,9 +270,27 @@ public class MenuDemarrage extends JDialog {
         return btn;
     }
 
-    public boolean isContreIA()       { return contreIA; }
-    public boolean isHumainEstBlanc() { return humainEstBlanc; }
-    public boolean isStartClicked()   { return startClicked; }
-    public String  getNomJoueur()     { return nomJoueur; }
-    public int     getTimerMinutes()  { return timerMinutes; }
+    public boolean isContreIA() {
+        return contreIA;
+    }
+
+    public boolean isHumainEstBlanc() {
+        return humainEstBlanc;
+    }
+
+    public boolean isStartClicked() {
+        return startClicked;
+    }
+
+    public String getNomJoueur() {
+        return nomJoueur;
+    }
+
+    public int getTimerMinutes() {
+        return timerMinutes;
+    }
+
+    public int getChoixIA() {
+        return choixIA;
+    }
 }
