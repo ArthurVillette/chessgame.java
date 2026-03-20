@@ -14,7 +14,7 @@ public class PlayerInfoPanel extends JPanel {
 
     // ── Palette cohérente ──────────────────────────────────────────
     private static final Color FOND        = new Color(38, 52, 38);
-    private static final Color FOND_TIMER  = new Color(22, 36, 22);
+    private static final Color FOND_TIMER  =  new Color(100, 65, 20);
     private static final Color BEIGE       = new Color(235, 235, 208);
     private static final Color OR          = new Color(212, 175, 55);
     private static final Color BLANC_PIECE = new Color(230, 230, 210);
@@ -49,7 +49,7 @@ public class PlayerInfoPanel extends JPanel {
 
         // Pion indicateur de couleur
         JLabel pion = new JLabel(estBlanc ? "♔" : "♚");
-        pion.setFont(new Font("Serif", Font.PLAIN, 18));
+        pion.setFont(new Font("Serif", Font.PLAIN, 28));
         pion.setForeground(estBlanc ? BLANC_PIECE : new Color(80, 80, 80));
 
         labelNom = new JLabel(nomJoueur);
@@ -68,12 +68,14 @@ public class PlayerInfoPanel extends JPanel {
             }
         };
         piecesPanel.setOpaque(false);
-        piecesPanel.setPreferredSize(new Dimension(250, 30));
+        piecesPanel.setPreferredSize(new Dimension(250, 40));
 
         // ── Droite : timer ───────────────────────────────────────
         labelTimer = new JLabel("");
         labelTimer.setFont(new Font("Monospaced", Font.BOLD, 15));
-        labelTimer.setForeground(BEIGE);
+        labelTimer.setForeground(new Color(212, 175, 55)); // or par défaut
+
+       // labelTimer.setForeground(BEIGE);
         labelTimer.setOpaque(true);
         labelTimer.setBackground(FOND_TIMER);
         labelTimer.setBorder(BorderFactory.createCompoundBorder(
@@ -112,7 +114,7 @@ public class PlayerInfoPanel extends JPanel {
         labelTimer.setText(String.format("%d:%02d", min, sec));
         labelTimer.setVisible(true);
         // Rouge si <30s
-        labelTimer.setForeground(secondes < 30 ? new Color(220, 80, 80) : BEIGE);
+        labelTimer.setForeground(secondes < 30 ? new Color(220, 80, 80) : new Color(244, 194, 122));
         labelTimer.repaint();
     }
 
@@ -173,7 +175,7 @@ public class PlayerInfoPanel extends JPanel {
 
         if (totalValeur > 0) {
             g2.setFont(new Font("SansSerif", Font.BOLD, 13));
-            g2.setColor(OR);
+            g2.setColor(Color.RED);
             g2.drawString("+" + totalValeur, x + 4, y - 1);
         }
     }

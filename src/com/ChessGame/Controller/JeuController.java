@@ -63,6 +63,10 @@ public class JeuController implements Runnable {
         frame.setOnForfait(this::gererForfait);
         frame.setOnPause(this::togglePause);
 
+        if (frame.getEvaluationPanel().isVisible()) {
+            this.SetEstEvaluer(true);
+        }
+
         SettingPanel menu = frame.getSettingPanel();
 
         menu.getItemJauge().addActionListener(e -> {
@@ -203,9 +207,12 @@ public class JeuController implements Runnable {
         if (tickTimer != null)
             tickTimer.stop();
         SwingUtilities.invokeLater(() -> {
-            String gagnant;
+            String gagnant=null;
             PopupFinPartie.TypeFin type;
-            if (partie.roiEnEchec(partie.getJoueurCourant())) {
+            if (partie.isTripleRepetition()) {
+                type = PopupFinPartie.TypeFin.REPETITION;
+            } else if
+             (partie.roiEnEchec(partie.getJoueurCourant())) {
                 type = PopupFinPartie.TypeFin.ECHEC_MAT;
                 gagnant = partie.getJoueurCourant().isWhite() ? nomNoir : nomBlanc;
             } else {
@@ -219,7 +226,7 @@ public class JeuController implements Runnable {
 
     /**
      * Génère la notation d'un coup pour l'afficher dans l'historique
-     * 
+     *
      * @param coup   Le coup joué
      * @param partie La partie en cours, nécessaire pour vérifier les règles
      *               spéciales (ex: échec)
@@ -288,7 +295,7 @@ public class JeuController implements Runnable {
 
     /**
      * Permet de définir si l'évaluation de la position doit être affichée ou non
-     * 
+     *
      * @param estEvaluer true pour afficher l'évaluation, false pour la masquer
      */
     public void SetEstEvaluer(boolean estEvaluer) {
@@ -297,7 +304,7 @@ public class JeuController implements Runnable {
 
     /**
      * Permet de définir si les notations des coups doivent être affichées ou non
-     * 
+     *
      * @param anotationEchec true pour afficher les notations, false pour les
      *                       masquer
      */

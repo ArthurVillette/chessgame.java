@@ -11,6 +11,7 @@ import com.ChessGame.Model.IA.IAClient;
 import com.ChessGame.Model.IA.JoueurIA;
 import com.ChessGame.Model.plateau.Board;
 import com.ChessGame.Model.AnalyseurPartie;
+import java.util.HashMap;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,8 @@ public class Partie extends Observable {
     private List<String> historiquePGN = new ArrayList<>();
     private ReseauManager reseauManager;
     private boolean estEnReseau = false;
+    private final HashMap<String, Integer> positionsVues = new HashMap<>();
+    private boolean tripleRepetition = false;
 
     /**
      * Constructeur de la classe Partie
@@ -99,6 +102,8 @@ public class Partie extends Observable {
     public Joueur getJoueurNoir() {
         return jNoir;
     }
+
+    public boolean isTripleRepetition() { return tripleRepetition; }
 
     /**
      * Permet d'obtenir le plateau de jeu actuel
@@ -201,7 +206,10 @@ public class Partie extends Observable {
 
         setChanged();
         notifyObservers(new EvenementMouvement());
+        enregistrerPosition();
     }
+
+
 
     /**
      * Notifie PromotionDialog via EvenementPromotion, puis BLOQUE
@@ -392,7 +400,11 @@ public class Partie extends Observable {
      * @return true si la partie est terminée, false sinon
      */
     public boolean estTerminee() {
-        if (roiEnEchecEtMat(jBlanc)) {
+        if (tripleRepetition) {
+            genererFichiersFinDePartie("1/2-1/2");
+            return true;
+        }
+       else if (roiEnEchecEtMat(jBlanc)) {
             System.out.println("Échec et mat ! Les noirs gagnent !");
             genererFichiersFinDePartie("0-1");
             return true;
@@ -671,4 +683,15 @@ public class Partie extends Observable {
             reseauManager.rejoindrePartie(ip, port, coupTexte -> recevoirCoupReseau(coupTexte));
         }
     }
+
+
+    private void enregistrerPosition() {
+        String fen = board.toFEN(joueurCourant.isWhite());
+        String cle = fen.substring(0, fen.lastIndexOf(" 0 1"));
+        int count = positionsVues.getOrDefault(cle, 0) + 1;
+        positionsVues.put(cle, count);
+        if (count >= 3) tripleRepetition = true;
+    }
+
+    public List<String> getHistoriquePGN() { return historiquePGN; }
 }

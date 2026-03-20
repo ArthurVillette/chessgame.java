@@ -26,7 +26,7 @@ public class EvaluationPanel extends JPanel {
      */
 
         public  EvaluationPanel() {
-        setPreferredSize(new Dimension(20, ChessFrame.TILE_SIZE * 8 + 2 * BoardPanel.MARGE));
+        setPreferredSize(new Dimension(15, ChessFrame.TILE_SIZE * 8 + 2 * BoardPanel.MARGE));
         setBackground(FOND_FENETRE);
         setToolTipText("0.0");
         }
