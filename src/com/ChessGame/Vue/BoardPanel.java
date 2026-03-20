@@ -20,8 +20,8 @@ public class BoardPanel extends JPanel implements Observer {
     private final Board board;
     private Partie partie;
     public static final int TILE_SIZE = ChessFrame.TILE_SIZE;
-    public static final int MARGE     = Math.max(30, ChessFrame.TILE_SIZE / 4);
-    private boolean estRetourne = false; // true si joueur joue Noir
+    public static final int MARGE = Math.max(30, ChessFrame.TILE_SIZE / 4);
+    private boolean estRetourne = false;
     private int selectedX = -1;
     private int selectedY = -1;
 
@@ -38,27 +38,29 @@ public class BoardPanel extends JPanel implements Observer {
         setPreferredSize(new Dimension(8 * TILE_SIZE + 2 * MARGE, 8 * TILE_SIZE + 2 * MARGE));
         loadAllImages();
 
-
-
     }
 
     /**
-     * Convertit une coordonnée de colonne (0-7) en coordonnée pixel X en fonction du retournement du plateau
+     * Convertit une coordonnée de colonne (0-7) en coordonnée pixel X en fonction
+     * du retournement du plateau
+     * 
      * @param col La coordonnée de colonne (0-7)
      * @return La coordonnée pixel X correspondante
      */
     private int toPixelX(int col) {
         return MARGE + (estRetourne ? (7 - col) : col) * TILE_SIZE;
     }
+
     /**
-     * Convertit une coordonnée de ligne (0-7) en coordonnée pixel Y en fonction du retournement du plateau
+     * Convertit une coordonnée de ligne (0-7) en coordonnée pixel Y en fonction du
+     * retournement du plateau
+     * 
      * @param row La coordonnée de ligne (0-7)
      * @return La coordonnée pixel Y correspondante
      */
     private int toPixelY(int row) {
         return MARGE + (estRetourne ? (7 - row) : row) * TILE_SIZE;
     }
-
 
     /**
      * Met à jour la sélection de la case et redessine le plateau
@@ -77,8 +79,9 @@ public class BoardPanel extends JPanel implements Observer {
         repaint();
     }
 
-    public void setPartie(Partie p) { this.partie = p; }
-
+    public void setPartie(Partie p) {
+        this.partie = p;
+    }
 
     /**
      * Met à jour la vue du plateau d'échecs lorsque le modèle change
@@ -87,7 +90,7 @@ public class BoardPanel extends JPanel implements Observer {
      * @param o   l'objet observable (Partie) qui a changé
      * @param arg un argument optionnel (non utilisé ici)
      **/
-    
+
     @Override
     public void update(java.util.Observable o, Object arg) {
         if (arg instanceof EvenementMouvement) {
@@ -131,7 +134,6 @@ public class BoardPanel extends JPanel implements Observer {
             int yLettre = MARGE + (8 * TILE_SIZE) + 20; // 20 pixels sous le plateau
             g.drawString(lettre, xLettre, yLettre);
 
-
             int rowLogique = estRetourne ? i : (7 - i);
             String chiffre = String.valueOf(rowLogique + 1);
             int textHeight = fm.getAscent();
@@ -153,7 +155,6 @@ public class BoardPanel extends JPanel implements Observer {
                     g.setColor(new Color(235, 235, 208));
                 else
                     g.setColor(new Color(119, 148, 85));
-
 
                 g.fillRect(toPixelX(col), toPixelY(row), TILE_SIZE, TILE_SIZE);
             }
@@ -181,7 +182,7 @@ public class BoardPanel extends JPanel implements Observer {
         g.setColor(new Color(0, 0, 255, 150));
         for (Point p : casesPossibles) {
 
-            g.fillRect(MARGE + p.x * TILE_SIZE, MARGE + p.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            g.fillRect(toPixelX(p.x), toPixelY(p.y), TILE_SIZE, TILE_SIZE);
         }
     }
 
@@ -206,6 +207,15 @@ public class BoardPanel extends JPanel implements Observer {
     }
 
     /**
+     * Indique si le plateau est retourné (le joueur joue les Noirs)
+     * 
+     * @return true si le plateau est retourné, false sinon
+     */
+    public boolean isRetourne() {
+        return this.estRetourne;
+    }
+
+    /**
      * Dessine les pièces sur le plateau en utilisant les images chargées
      * 
      * @param g Le contexte graphique pour dessiner les pièces
@@ -219,7 +229,8 @@ public class BoardPanel extends JPanel implements Observer {
                     if (piece.getSymbol() == 'k' || piece.getSymbol() == 'K') {
                         if (partie != null) {
                             com.ChessGame.Model.jeu.Joueur joueur = piece.getColor().equals(java.awt.Color.WHITE)
-                                    ? partie.getJoueurBlanc() : partie.getJoueurNoir();
+                                    ? partie.getJoueurBlanc()
+                                    : partie.getJoueurNoir();
                             if (joueur != null && partie.roiEnEchec(joueur)) {
                                 g.setColor(new Color(220, 50, 50, 180));
                                 g.fillRect(toPixelX(col), toPixelY(row), TILE_SIZE, TILE_SIZE);

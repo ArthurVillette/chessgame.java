@@ -24,7 +24,6 @@ public class ChessController extends MouseAdapter {
     private Point selection = null; // null = aucune pièce sélectionnée
     private boolean enPause = false;
 
-
     public ChessController(Board model, ChessFrame view, Partie partie) {
         this.model = model;
         this.view = view;
@@ -45,7 +44,8 @@ public class ChessController extends MouseAdapter {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        if (enPause) return;
+        if (enPause)
+            return;
         int clicX = e.getX() - BoardPanel.MARGE;
         int clicY = e.getY() - BoardPanel.MARGE;
         if (clicX < 0 || clicY < 0 || clicX >= 8 * BoardPanel.TILE_SIZE || clicY >= 8 * BoardPanel.TILE_SIZE) {
@@ -59,7 +59,10 @@ public class ChessController extends MouseAdapter {
 
         int x = clicX / BoardPanel.TILE_SIZE;
         int y = clicY / BoardPanel.TILE_SIZE;
-
+        if (boardPanel.isRetourne()) {
+            x = 7 - x;
+            y = 7 - y;
+        }
         if (selection == null) {
             Piece piece = model.getPiece(x, y);
             if (piece == null)
