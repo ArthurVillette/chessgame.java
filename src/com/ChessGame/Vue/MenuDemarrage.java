@@ -104,19 +104,25 @@ public class MenuDemarrage extends JDialog {
 
         // --- Section Adversaire ---
         corps.add(sectionLabel("ADVERSAIRE"));
-        JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+
+        // CORRECTION 1 : On réduit l'espacement entre les boutons de 20 à 10
+        JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         modePanel.setOpaque(false);
 
-        JToggleButton btnIA = toggle("IA (Villette)", false, new Dimension(160, 45));
-        JToggleButton btnIA2 = toggle("IA (Stockfish)", false, new Dimension(160, 45));
+        // CORRECTION 2 : On réduit la largeur des boutons de 160 à 135
+        JToggleButton btnIA = toggle("IA (Villette)", false, new Dimension(120, 45));
+        JToggleButton btnIA2 = toggle("IA (Stockfish)", false, new Dimension(120, 45));
         ButtonGroup grpIA = new ButtonGroup();
         grpIA.add(btnIA);
         grpIA.add(btnIA2);
-        JToggleButton btnHumain = toggle("Humain Local", true, new Dimension(160, 45));
+
+        JToggleButton btnHumain = toggle("Humain Local", true, new Dimension(120, 45));
+
         ButtonGroup grpMode = new ButtonGroup();
         grpMode.add(btnIA);
         grpMode.add(btnIA2);
         grpMode.add(btnHumain);
+
         modePanel.add(btnIA);
         modePanel.add(btnIA2);
         modePanel.add(btnHumain);

@@ -47,9 +47,9 @@ public class Main {
             nomNoir = "Joueur 2";
         } else if (humainEstBlanc) {
             nomBlanc = nomJoueur;
-            nomNoir = "Villette IA";
+            nomNoir = "IA";
         } else {
-            nomBlanc = "Villette IA";
+            nomBlanc = "IA";
             nomNoir = nomJoueur;
         }
         Board board = new Board();
