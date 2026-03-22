@@ -1,27 +1,26 @@
-# Création d'un jeu d'échec (PoissonBloqué)
+# ♟️ Poisson Bloqué - Jeu d'Échecs
 
-## Prerequie
+Un jeu d'échecs complet développé en Java, incluant la possibilité de jouer en réseau local, contre un adversaire humain, ou contre des intelligences artificielles (Stockfish et Villette).
 
-- Avoir java sur son PC
-- Installé Stockfish sur votre PC
-- Dans un fichier .env a la racine du projet ajouté le chemin dans votre variable: CHEMIN_STOCKFISH
-- pour jouer avec l'ia mettez le chemin en fonction de votre pc pour linux: CHEMIN_VILLETTE= ./lanceur_villette.sh et pour windows CHEMIN_VILLETTE=jsp
+## 📋 Prérequis
 
-## Lancement 
+Avant de lancer le projet, assurez-vous d'avoir les éléments suivants sur votre machine :
 
-Compilation en linux utilisé cette commande :
+1. **Java (JDK)** installé sur votre ordinateur.
+2. **Stockfish** installé sur votre machine.
+3. Un fichier de configuration **`.env`** placé à la racine du projet.
 
-```javac $(find src -name "*.java")```
-Lancer utilisé :
+### Configuration du fichier `.env`
+Créez un fichier nommé `.env` à la racine de votre projet et ajoutez-y les chemins vers vos moteurs IA. 
 
-```  c:; cd 'c:\Users\Arthur\OneDrive\Bureau\cours\polytech\meilleur_Projet_De_Tous_Les_TEMPS_LE_Truc_De_Guedin_De_Fou\chessgame.java'; & 'C:\Program Files\Java\jdk-20\bin\java.exe' '-XX:+ShowCodeDetailsInExceptionMessages' '-cp' 'C:\Users\Arthur\AppData\Roaming\Code\User\workspaceStorage\d81aecfd14b9842ed57dd3468c5445ce\redhat.java\jdt_ws\chessgame.java_789c6e61\bin' 'com.ChessGame.Main'  ```
+Exemple de contenu (à adapter selon votre système) :
+```env
+# Chemin vers l'exécutable Stockfish
+CHEMIN_STOCKFISH=stockfish
 
-Pour lancer la javadoc: 
+# Chemin vers le lanceur de votre IA personnalisée (ex: Linux)
+CHEMIN_VILLETTE=./lanceur_villette.sh 
+```
 
-crée un dossier doc: 
-
-```mkdir doc ```
-
-lancer la commande: 
-
-``` javadoc -d doc -sourcepath src -subpackages com.ChessGame ```
+#### github
+https://github.com/ArthurVillette/chessgame.java
