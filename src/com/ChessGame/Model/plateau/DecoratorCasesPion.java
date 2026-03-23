@@ -1,6 +1,7 @@
 package com.ChessGame.Model.plateau;
 
 import com.ChessGame.Model.ChessPieces.Bishop;
+import com.ChessGame.Model.ChessPieces.Pawn;
 import com.ChessGame.Model.jeu.Coup;
 import com.ChessGame.Model.ChessPieces.Piece;
 
@@ -55,7 +56,7 @@ public class DecoratorCasesPion extends DecoratorCasesAccessibles {
         Coup dernierCoup = plateau.getDernierCoup();
         if (dernierCoup != null) {
             Piece pieceAdverse = plateau.getPiece(dernierCoup.arrivee.x, dernierCoup.arrivee.y);
-            boolean estUnPion        = pieceAdverse instanceof Bishop.Pawn;
+            boolean estUnPion        = pieceAdverse instanceof Pawn;
             boolean aAvanceDeDeux    = Math.abs(dernierCoup.arrivee.y - dernierCoup.depart.y) == 2;
             boolean estSurMaLigne    = dernierCoup.arrivee.y == y;
             boolean estACoté         = Math.abs(dernierCoup.arrivee.x - x) == 1;
