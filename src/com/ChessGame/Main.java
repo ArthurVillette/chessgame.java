@@ -57,7 +57,6 @@ public class Main {
         Partie partie = new Partie(board, contreIA, humainEstBlanc, choixIA);
 
         BoardPanel boardPanel = frame.getBoardPanel();
-        // EvaluationPanel evaluationPanel = new EvaluationPanel();
 
         partie.addObserver(frame.getBoardPanel());
         frame.getBoardPanel().setPartie(partie);
@@ -95,8 +94,6 @@ public class Main {
             frame.setTempsJoueur(false, timerMinutes * 60);
         }
 
-        // JeuController jeuController = new JeuController(partie, boardPanel,
-        // evaluationPanel, frame);
         Thread threadJeu = new Thread(jeuController);
         threadJeu.setDaemon(true);
         threadJeu.start();

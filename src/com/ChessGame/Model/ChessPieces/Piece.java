@@ -41,14 +41,7 @@ public abstract class Piece {
         this.decorateur = decorateur;
     }
 
-    /**
-     * Retourne la couleur de la pièce
-     *
-     * @return La couleur de la pièce (Color.WHITE ou Color.BLACK)
-     */
-   /* public Color getColor() {
-        return color;
-    }*/
+
 
     /**
      * Initialise le décorateur avec le plateau et cette pièce.
@@ -69,42 +62,9 @@ public abstract class Piece {
         return decorateur.getCasesAccessibles(position);
     }
 
-    /**
-     * Retourne le symbole de la pièce
-     * 
-     * @return Le symbole représentant la pièce (ex: 'P' pour Pawn, 'K' pour King,
-     *         etc.)
-     */
-    /*public char getSymbol() {
-        return symbol;
-    }*/
 
     /**
-     * Retourne le chemin de l'image représentant la pièce
-     * 
-     * @return Le chemin de l'image (ex: "/assets/pieces/wP.png" pour un pion blanc)
-     */
-    /*public String getImagePath() {
-        String colorP = (color == Color.WHITE) ? "w" : "b";
-        return "/assets/pieces/" + colorP + symbol + ".png";
-
-    }*/
-
-    /**
-     * Méthode abstraite à implémenter dans les classes filles pour retourner les
-     * mouvements valides de la pièce
-     * 
-     * @param position La position actuelle de la pièce sur le plateau
-     * @param board    Le plateau de jeu actuel
-     * @return Une liste de points représentant les positions valides où la pièce
-     *         peut se déplacer
-     */
-    //public abstract List<Point> mouvementsValides(Point position, Board board);
-
-
-    //-----
-    /**
-     * Compatibilité avec l'ancien code : retourne les mouvements sous forme de List<Point>.
+     *  retourne les mouvements sous forme de List<Point>.
      * Utilisé par Partie et ChessController.
      */
     public List<Point> mouvementsValides(Point pos, Board board) {

@@ -1,11 +1,6 @@
 package com.ChessGame.Model.jeu;
 
-import com.ChessGame.Model.ChessPieces.Bishop;
-import com.ChessGame.Model.ChessPieces.King;
-import com.ChessGame.Model.ChessPieces.Piece;
-import com.ChessGame.Model.ChessPieces.Rook;
-import com.ChessGame.Model.ChessPieces.Queen;
-import com.ChessGame.Model.ChessPieces.Knight;
+import com.ChessGame.Model.ChessPieces.*;
 import com.ChessGame.Model.IA.Config;
 import com.ChessGame.Model.IA.IAClient;
 import com.ChessGame.Model.IA.JoueurIA;
@@ -147,7 +142,7 @@ public class Partie extends Observable {
         historiquePGN.add(genererNotationPGN(coup));
 
         // --- PRISE EN PASSANT ---
-        if (piece instanceof Bishop.Pawn) {
+        if (piece instanceof Pawn) {
             boolean captureEnDiagonale = (coup.arrivee.x != coup.depart.x);
             boolean caseArriveeVide = (board.getPiece(coup.arrivee.x, coup.arrivee.y) == null);
             if (captureEnDiagonale && caseArriveeVide) {
@@ -184,7 +179,7 @@ public class Partie extends Observable {
         board.setDernierCoup(coup);
 
         // --- PROMOTION ---
-        if (piece instanceof Bishop.Pawn) {
+        if (piece instanceof Pawn) {
             int lignePromotion = piece.getColor().equals(Color.WHITE) ? 0 : 7;
             if (coup.arrivee.y == lignePromotion) {
 
